@@ -5,3 +5,6 @@
 
 # Compiled class files
 *.class
+
+# Some misc files
+misc/TODO-etc.md
