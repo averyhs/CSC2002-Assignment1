@@ -9,10 +9,14 @@
  * 
  */
 public class ElevationAnalysis {
-	private PointElevation[][] map;
+	private static final double HEIGHT_DIFF = 0.01; // threshold
+	
+	private PointElevation[][] map; // grid of elevation data
+	private int basinCount; // counter: number of basins	
 	
 	ElevationAnalysis(PointElevation[][] map) {
 		this.map = map;
+		this.basinCount = 0;
 	}
 	
 	/**
@@ -35,20 +39,29 @@ public class ElevationAnalysis {
 				}
 				
 				else { // unclassified point
-					if (map[i][j].val()+0.01 <= map[i-1][j-1].val() &&
-						map[i][j].val()+0.01 <= map[i-1][j].val() &&
-						map[i][j].val()+0.01 <= map[i-1][j+1].val() &&
-						map[i][j].val()+0.01 <= map[i][j-1].val() &&
-						map[i][j].val()+0.01 <= map[i][j+1].val() &&
-						map[i][j].val()+0.01 <= map[i+1][j-1].val() &&
-						map[i][j].val()+0.01 <= map[i+1][j].val() &&
-						map[i][j].val()+0.01 <= map[i+1][j+1].val()) {
+					if (map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i][j+1].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
+						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val()) {
 						
 						// all neighbors are at least 0.01m higher
 						// ==> qualifies as basin
 						map[i][j].flagAsBasin();
+						basinCount++;
 						
 						// also, neighbors qualify as not-basins
+						map[i-1][j-1].flagAsNotBasin();
+						map[i-1][j].flagAsNotBasin();
+						map[i-1][j+1].flagAsNotBasin();
+						map[i][j-1].flagAsNotBasin();
+						map[i][j+1].flagAsNotBasin();
+						map[i+1][j-1].flagAsNotBasin();
+						map[i+1][j].flagAsNotBasin();
+						map[i+1][j+1].flagAsNotBasin();
 						/* XXX:
 						 * Is it more efficient to do checks first
 						 * or just (re)assign?
@@ -58,14 +71,6 @@ public class ElevationAnalysis {
 						 * Could this introduce race conditions
 						 * in parallel implementation?
 						 */
-						map[i-1][j-1].flagAsNotBasin();
-						map[i-1][j].flagAsNotBasin();
-						map[i-1][j+1].flagAsNotBasin();
-						map[i][j-1].flagAsNotBasin();
-						map[i][j+1].flagAsNotBasin();
-						map[i+1][j-1].flagAsNotBasin();
-						map[i+1][j].flagAsNotBasin();
-						map[i+1][j+1].flagAsNotBasin();
 					}
 					
 					else {
@@ -78,5 +83,40 @@ public class ElevationAnalysis {
 		}
 	}
 	
-	public int[][] listBasins() {}
+	/**
+	 * Collates Basin/NotBasin data into an array containing the coords
+	 * of each basin
+	 * 
+	 * @return List of basin coords
+	 */
+	public int[][] listBasins() {
+		int[][] list = new int[basinCount][2];
+		int l=0; // list index
+		
+		for (int i=0; i<map.length; i++) { // iterate through rows
+			for (int j=0; j<map[i].length; j++) { // iterate through columns
+				if (map[i][j].isBasin()) {
+					list[l][0] = i;
+					list[l][1] = j;
+					l++;
+				}
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * Accessor
+	 * @return number of basins found in data
+	 */
+	public int basinCount() {
+		return basinCount;
+	}
 }
+
+
+
+
+
+
+
