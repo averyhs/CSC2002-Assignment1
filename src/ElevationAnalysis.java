@@ -28,11 +28,16 @@ public class ElevationAnalysis {
 	 *   <li>When a point is classified as Basin, all neighbors are 
 	 *   classified as NotBasin</li>
 	 *   <li>Point is skipped if already classified</li>
+	 *   <li>Borders are excluded</li>
 	 * </ul></p>
 	 */
 	public void findBasins() {
-		for (int i=0; i<map.length; i++) { // iterate through rows
-			for (int j=0; j<map[i].length; j++) { // iterate through columns
+		// for loop indices exclude borders (automatically NotBasin)
+		int ilo=1, jlo=1;
+		int ihi=map.length-1, jhi=map[i].length-1;
+		
+		for (int i=ilo; i<ihi; i++) { // iterate through rows
+			for (int j=jlo; j<jhi; j++) { // iterate through columns
 				
 				if (map[i][j].isBasin() || map[i][j].isNotBasin()) {
 					continue; // skip if point is already classified
@@ -93,8 +98,12 @@ public class ElevationAnalysis {
 		int[][] list = new int[basinCount][2];
 		int l=0; // list index
 		
-		for (int i=0; i<map.length; i++) { // iterate through rows
-			for (int j=0; j<map[i].length; j++) { // iterate through columns
+		// for loop indices exclude borders (automatically NotBasin)
+		int ilo=1, jlo=1;
+		int ihi=map.length-1, jhi=map[i].length-1;
+		
+		for (int i=ilo; i<ihi; i++) { // iterate through rows
+			for (int j=jlo; j<jhi; j++) { // iterate through columns
 				if (map[i][j].isBasin()) {
 					list[l][0] = i;
 					list[l][1] = j;
