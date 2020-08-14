@@ -34,7 +34,7 @@ public class ElevationAnalysis {
 	public void findBasins() {
 		// for loop indices exclude borders (automatically NotBasin)
 		int ilo=1, jlo=1;
-		int ihi=map.length-1, jhi=map[i].length-1;
+		int ihi=map.length-1, jhi=map[0].length-1;
 		
 		for (int i=ilo; i<ihi; i++) { // iterate through rows
 			for (int j=jlo; j<jhi; j++) { // iterate through columns
@@ -100,7 +100,7 @@ public class ElevationAnalysis {
 		
 		// for loop indices exclude borders (automatically NotBasin)
 		int ilo=1, jlo=1;
-		int ihi=map.length-1, jhi=map[i].length-1;
+		int ihi=map.length-1, jhi=map[0].length-1;
 		
 		for (int i=ilo; i<ihi; i++) { // iterate through rows
 			for (int j=jlo; j<jhi; j++) { // iterate through columns
