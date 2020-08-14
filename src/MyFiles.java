@@ -4,7 +4,7 @@
  * @author hrrhan002
  *
  */
-public class MyFiles {
+class MyFiles {
 	public static PointElevation[][] extractTerrainData(String filepath) {}
 	
 	public static void compileTerrainData(int[][] coords, String filename) {}

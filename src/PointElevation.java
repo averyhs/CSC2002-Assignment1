@@ -9,17 +9,31 @@
  *
  */
 public class PointElevation {
-	private float elevation;
+	private double elevation;
 	private boolean isBasin;
 	private boolean isNotBasin;
 	
-	PointElevation() {}
+	PointElevation(double elevation) {
+		this.elevation = elevation;
+	}
 	
-	public void flagAsBasin() {}
+	public double val() {
+		return elevation;
+	}
 	
-	public void flagAsNotBasin() {}
+	public void flagAsBasin() {
+		isBasin = true;
+	}
 	
-	public boolean isBasin() {}
+	public void flagAsNotBasin() {
+		isNotBasin = true;
+	}
 	
-	public boolean isNotBasin() {}
+	public boolean isBasin() {
+		return isBasin;
+	}
+	
+	public boolean isNotBasin() {
+		return isNotBasin;
+	}
 }
