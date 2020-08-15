@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -9,11 +11,52 @@ import java.io.IOException;
  *
  */
 class MyFiles {
-	public static PointElevation[][] extractTerrainData(String filename) {}
+	/**
+	 * <p>Reads terrain data from a file in format shown below. Data is written into
+	 * a {@link PointElevation} array.</p>
+	 * <p> Required file format:<br> <terrain num rows – INT> <terrain num cols – INT> <br>
+	 * <height at grid pos (0,0) - FLOAT> <height at grid pos (0,1) - FLOAT> ... etc.</p>
+	 * @param filename
+	 * @return PointElevation grid with data from file
+	 */
+	public static PointElevation[][] extractTerrainData(String filename) {
+		try {
+			// IO objects
+			File inFile = new File(filename);
+			Scanner inScanner = new Scanner(inFile);
+			
+			/* XXX:
+			 * Assumption is that files are well formed. No hasNext*() checks.
+			 */
+			
+			// get dimensions
+			int rows = inScanner.nextInt();
+			int cols = inScanner.nextInt();
+			inScanner.next(); // discard newline
+			
+			// create empty grid with dims
+			PointElevation[][] grid = new PointElevation[rows][cols];
+			
+			// populate grid
+			for (int i=0; i<rows; i++) {
+				for (int j=0; j<cols; j++) {
+					grid[i][j] = new PointElevation(inScanner.nextDouble());
+				}
+			}
+			
+			inScanner.close();
+			return grid;
+		}
+		catch(FileNotFoundException e) { // very general exception handling
+			System.out.println("Error opening or reading file "+filename);
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	/**
 	 * <p>Writes basin data to output file with the given name.</p>
-	 * <p>Note that if the file already exists, it must be empty-</p>
+	 * <p>Note that if the file already exists, it must be empty</p>
 	 * 
 	 * @param total Total number of basins listed
 	 * @param coords List of coordinates for each basin
@@ -30,7 +73,7 @@ class MyFiles {
 			else {
 				System.out.println("File "+filename+" found.");
 				if (outFile.length() != 0L) { // check if file is empty
-					throw new IOException("File "+filename+" not empty. Delete contents and "
+					System.out.println("File "+filename+" not empty. Delete contents and "
 							+ "rerun application.");
 				}
 			}

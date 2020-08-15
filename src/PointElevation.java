@@ -14,6 +14,8 @@ public class PointElevation {
 	private boolean isNotBasin;
 	
 	PointElevation(double elevation) {
+		this.isBasin = false;
+		this.isNotBasin = false;
 		this.elevation = elevation;
 	}
 	
