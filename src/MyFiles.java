@@ -32,7 +32,6 @@ class MyFiles {
 			// get dimensions
 			int rows = inScanner.nextInt();
 			int cols = inScanner.nextInt();
-			inScanner.next(); // discard newline
 			
 			// create empty grid with dims
 			PointElevation[][] grid = new PointElevation[rows][cols];
@@ -73,8 +72,8 @@ class MyFiles {
 			else {
 				System.out.println("File "+filename+" found.");
 				if (outFile.length() != 0L) { // check if file is empty
-					System.out.println("File "+filename+" not empty. Delete contents and "
-							+ "rerun application.");
+					System.out.println("File "+filename+" not empty. "
+							+ "Contents will be overwritten.");
 				}
 			}
 			
@@ -83,7 +82,7 @@ class MyFiles {
 			// write total and coords to file
 			outWriter.write(total + "\n");
 			for (int i=0; i<coords.length; i++) {
-				outWriter.write(coords[i][0] + " " + coords[i][1]);
+				outWriter.write(coords[i][0] + " " + coords[i][1] + "\n");
 			}
 			
 			outWriter.close();
