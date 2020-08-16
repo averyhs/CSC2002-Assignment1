@@ -10,6 +10,8 @@ public class TerrainClassify {
 	private static double t_tick;
 	
 	public static void main(String[] args) {
+		System.out.println("This is the first debug.");
+		
 		String ipp = "../io-files/"; // input file path prefix
 		String opp = "../io-files/"; // output file path prefix
 		
