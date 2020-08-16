@@ -9,17 +9,17 @@
  *
  */
 public class PointElevation {
-	private double elevation;
+	private float elevation;
 	private boolean isBasin;
 	private boolean isNotBasin;
 	
-	PointElevation(double elevation) {
+	PointElevation(float elevation) {
 		this.isBasin = false;
 		this.isNotBasin = false;
 		this.elevation = elevation;
 	}
 	
-	public double val() {
+	public float val() {
 		return elevation;
 	}
 	
