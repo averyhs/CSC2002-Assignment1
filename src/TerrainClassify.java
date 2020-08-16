@@ -6,12 +6,12 @@
  *
  */
 public class TerrainClassify {
-	private ElevationAnalysis analyze;
+	private static ElevationAnalysis analyze;
 	private static double t_tick;
 	
-	public void main(String[] args) {
-		String ipp = "../"; // input file path prefix
-		String opp = "../"; // output file path prefix
+	public static void main(String[] args) {
+		String ipp = "../io-files/"; // input file path prefix
+		String opp = "../io-files/"; // output file path prefix
 		
 		String infile = ipp+args[0];
 		String outfile = opp+args[1];
