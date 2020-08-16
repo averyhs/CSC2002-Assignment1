@@ -32,7 +32,6 @@ class MyFiles {
 			// get dimensions
 			int rows = inScanner.nextInt();
 			int cols = inScanner.nextInt();
-			inScanner.next(); // discard newline
 			
 			// create empty grid with dims
 			PointElevation[][] grid = new PointElevation[rows][cols];
@@ -73,8 +72,8 @@ class MyFiles {
 			else {
 				System.out.println("File "+filename+" found.");
 				if (outFile.length() != 0L) { // check if file is empty
-					System.out.println("File "+filename+" not empty. Delete contents and "
-							+ "rerun application.");
+					System.out.println("File "+filename+" not empty. "
+							+ "Contents will be overwritten.");
 				}
 			}
 			
