@@ -62,7 +62,7 @@ class MyFiles {
 	 * @param coords List of coordinates for each basin
 	 * @param filename Name of output file
 	 */
-	public static void compileTerrainData(int total, int[][] coords, String filename) throws IOException {
+	public static void compileTerrainData(int total, int[][] coords, String filename) {
 		try {
 			File outFile = new File(filename);
 			
