@@ -9,7 +9,7 @@
  * 
  */
 public class ElevationAnalysis {
-	private static final double HEIGHT_DIFF = 0.01; // threshold
+	private static final float HEIGHT_DIFF = 0.01; // threshold
 	
 	private PointElevation[][] map; // grid of elevation data
 	private int basinCount; // counter: number of basins	
