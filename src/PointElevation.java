@@ -38,4 +38,8 @@ public class PointElevation {
 	public boolean isNotBasin() {
 		return isNotBasin;
 	}
+	
+	public String toString() {
+		return String.valueOf(elevation);
+	}
 }
