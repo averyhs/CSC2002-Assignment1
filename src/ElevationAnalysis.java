@@ -1,3 +1,5 @@
+import java.util.concurrent.RecursiveTask;
+
 /**
  * <p>Perform analysis on a grid of {@link PointElevation} objects.</p>
  * 
@@ -5,46 +7,43 @@
  * neighbors all have greater values, interpreted as a point on a terrain 
  * where water may accumulate.)</p>
  * 
+ * <p>Parallel implementation:<br>
+ * Uses divide-and-conquer algorithm on the PointElevation array. Note that
+ * RecursiveTask has type int[][]; Nothing needs to be returned when only 
+ * findBasins() is done in parallel, so the type is set to int[][] for a 
+ * possible extension to listBasins() too.</p>
+ * 
  * @author hrrhan002
  * 
  */
-public class ElevationAnalysis {
-	private static final float HEIGHT_DIFF = 0.01f; // threshold
+public class ElevationAnalysis extends RecursiveTask<int[][]> {
+	private static final float HEIGHT_DIFF = 0.01f; // threshold for basin
+	private static final int SEQUENTIAL_CUTOFF = 500;
+	
+	/* TODO:
+	 * Test to find best value for SEQUENTIAL_CUTOFF
+	 */
 	
 	private PointElevation[][] map; // grid of elevation data
-	private int basinCount; // counter: number of basins	
+	private int basinCount; // counter for number of basins	
+	private boolean inParallel; // run parallel or sequential
 	
-	ElevationAnalysis(PointElevation[][] map) {
+	ElevationAnalysis(PointElevation[][] map, boolean inParallel) {
 		this.map = map;
 		this.basinCount = 0;
+		this.inParallel = inParallel;
 	}
 	
 	/**
-	 * <p>Iterates through the PointElevation array and classifies each as
-	 * Basin or NotBasin.</p>
-	 * 
-	 * <p>Some implementation details:
-	 * <ul>
-	 *   <li>When a point is classified as Basin, all neighbors are 
-	 *   classified as NotBasin</li>
-	 *   <li>Point is skipped if already classified</li>
-	 *   <li>Borders are excluded</li>
-	 * </ul></p>
+	 * <p>Iterates through the PointElevation array and flags points that
+	 * meet the basin criteria.</p>
 	 */
-	public void findBasins() {
-		// for loop indices exclude borders (automatically NotBasin)
-		int ilo=1, jlo=1;
-		int ihi=map.length-1, jhi=map[0].length-1;
-		
+	public void findBasins(int ilo, int jlo, int ihi, int jhi) {
+				
 		for (int i=ilo; i<ihi; i++) { // iterate through rows
 			for (int j=jlo; j<jhi; j++) { // iterate through columns
 				
-				if (map[i][j].isBasin() || map[i][j].isNotBasin()) {
-					continue; // skip if point is already classified
-				}
-				
-				else { // unclassified point
-					if (map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
+				if (map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
 						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
 						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
 						map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
@@ -52,38 +51,26 @@ public class ElevationAnalysis {
 						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
 						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
 						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val()) {
-						
-						// all neighbors are at least 0.01m higher
-						// ==> qualifies as basin
-						map[i][j].flagAsBasin();
-						basinCount++;
-						
-						// also, neighbors qualify as not-basins
-						map[i-1][j-1].flagAsNotBasin();
-						map[i-1][j].flagAsNotBasin();
-						map[i-1][j+1].flagAsNotBasin();
-						map[i][j-1].flagAsNotBasin();
-						map[i][j+1].flagAsNotBasin();
-						map[i+1][j-1].flagAsNotBasin();
-						map[i+1][j].flagAsNotBasin();
-						map[i+1][j+1].flagAsNotBasin();
-						/* XXX:
-						 * Is it more efficient to do checks first
-						 * or just (re)assign?
-						 * or even just leave this out.
-						*/
-						/* XXX:
-						 * Could this introduce race conditions
-						 * in parallel implementation?
-						 */
-					}
 					
-					else {
-						// not all neighbors are at least 0.01m higher
-						// ==> qualifies as not-basin
-						map[i][j].flagAsNotBasin();
-					}
+					// all neighbors are at least 0.01m higher
+					// ==> qualifies as basin
+					map[i][j].flagAsBasin();
+					basinCount++;
+					
+					/* NOTE:
+					 * In purely sequential version of this class, once
+					 * a point was flagged as Basin, all of its neighbors
+					 * were flagged as NotBasin. I was thinking it may 
+					 * introduce some bad concurrency if i tried to do it 
+					 * in a simple parallel implementation, so i scrapped
+					 * it. But it's something to try again.
+					 * 
+					 * I won't do that now, so i can get a good comparison, 
+					 * but i'll put the sequential version as a git branch 
+					 * for reference to that version of the method
+					 */
 				}
+
 			}
 		}
 	}
@@ -121,9 +108,17 @@ public class ElevationAnalysis {
 	public int basinCount() {
 		return basinCount;
 	}
+	
+	public int[][] compute() {
+		
+	}
 }
 
-
+// compute:
+// loop indices for sequential computation:
+	// for loop indices exclude borders (automatically NotBasin)
+	// int ilo=1, jlo=1;
+	// int ihi=map.length-1, jhi=map[0].length-1;
 
 
 
