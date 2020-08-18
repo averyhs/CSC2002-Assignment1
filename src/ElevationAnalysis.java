@@ -7,9 +7,6 @@ import java.util.concurrent.RecursiveTask;
  * neighbors all have greater values, interpreted as a point on a terrain 
  * where water may accumulate.)</p>
  * 
- * <p>Parallel implementation:<br>
- * Uses divide-and-conquer algorithm on the PointElevation array.</p>
- * 
  * @author hrrhan002
  * 
  */
@@ -24,132 +21,112 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * stackoverflow:
 	 * https://stackoverflow.com/questions/285793/what-is-a-serialversionuid-and-why-should-i-use-it
 	 */
-	private static final long serialVersionUID = -6184225960884672569L;
+	private static final long serialVersionUID = -4191663543839944617L;
 
-	private static final float HEIGHT_DIFF = 0.01f; // threshold for basin
-	private static final int SEQUENTIAL_CUTOFF = 500;
-	/* TODO:
-	 * Test to find best value for SEQUENTIAL_CUTOFF
+	/**
+	 * <p>Height difference threshold, between a point and its 
+	 * neighbors, for point to be classified as a basin.</p>
 	 */
-	
-	/* NOTE:
-	 * map is static so that different threads can modify the points
-	 * (simultaneously, in different places)
-	 */
-	private static PointElevation[][] map = null; // grid of elevation data
-	
-	private int basinCount; // counter for number of basins
-	private int[] idxs; // indexes for traversing map: ilo, jlo, ihi, jhi
+	private static final float HEIGHT_DIFF = 0.01f;
 	
 	/**
-	 * <p>Creates new ElevationAnalysis object with basinCount set to 0 and
-	 * indexes as specified.</p>
+	 * <p>The cutoff for amount of data points processed in 
+	 * parallel. Below this point, processing is sequential.</p>
+	 */
+	private static final int SEQUENTIAL_CUTOFF = 500;
+	
+	/**
+	 * <p>A grid of point elevations, the data to be analyzed.</p>
+	 * <p>This is a static variable so that all the threads of my 
+	 * simple divide-and-conquer algorithm can access it. Being
+	 * static does create some weak points though, for example 
+	 * if a constructor that sets the map is called while some 
+	 * of these objects are still supposed to be working on the 
+	 * previous map.</p>
+	 */
+	private static PointElevation[][] map = null;
+	
+	int ilo, jlo, ihi, jhi; // indexes for for loops
+	int basinCount;
+	
+	/**
+	 * <p>Creates a new ElevationAnalysis object with map data given
+	 * by the PointElevation array passed in.</p>
 	 * 
-	 * <p>This constructor does not initialize the map variable so be sure
-	 * to use setmap() if there are no existing ElevationAnalysis objects
-	 * when this constructor is called.</p>
+	 * <p>Note: This constructor resets the static map of the class. 
+	 * It should not be called while another instantiation is 
+	 * still being, or will still be, used.</p>
+	 * 
+	 * @param m A point elevation grid containing the data.
+	 */
+	ElevationAnalysis(PointElevation[][] m) {
+		map = m;
+		System.out.println("Warning: ElevationAnalysis.map has been reset.");
+		
+		basinCount = 0;
+	}
+	
+	/**
+	 * <p>Creates a new ElevationAnalysis object with loop indexes 
+	 * given by the values passed in. Map is unchanged.</p>
+	 * 
+	 * @param ilo Starting row index
+	 * @param jlo Starting col index
+	 * @param ihi Ending row index
+	 * @param jhi Ending col index
 	 */
 	ElevationAnalysis(int ilo, int jlo, int ihi, int jhi) {
-		this.basinCount = 0;
-		idxs = new int[]{ilo, jlo, ihi, jhi};
-	}
-	
-	/**
-	 * <p>This constructor resets the static map of the class. It should only
-	 * be called once for a particular data set. It should not be used while 
-	 * other instantiations of ElevationAnalysis exist.</p>
-	 * 
-	 * <p>basinCount set to 0, index array set to null.</p>
-	 * 
-	 * @param map The terrain data in the format of a PointElevation array
-	 */
-	ElevationAnalysis(PointElevation[][] map) {
-		ElevationAnalysis.map = map;
-		System.out.println("Warning: ElevationAnalysis.map has been reset.");
 		basinCount = 0;
-		idxs = null;
+		
+		this.ilo = ilo;
+		this.jlo = jlo;
+		this.ihi = ihi;
+		this.jhi = jhi;
 	}
 	
-	/**
-	 * <p>Iterates through the section of the PointElevation array 
-	 * specified by the index parameters and flags points that meet 
-	 * the basin criteria.</p>
-	 * 
-	 * <p>Note that borders are classified as notBasin</p>
-	 * 
-	 * @param ilo The starting row index
-	 * @param jlo The starting column index
-	 * @param ihi The ending row index
-	 * @param jhi The ending column index.
+	/*
+	 * Check all neighbors of point(i,j) are at least 
+	 * HEIGHT_DIFF meters higher
 	 */
-	public void findBasins(int ilo, int jlo, int ihi, int jhi) {	
-		for (int i=ilo; i<ihi; i++) { // iterate through rows
-			for (int j=jlo; j<jhi; j++) { // iterate through columns
-				
-				if (i==0 || i==map.length || j==0 || j==map[0].length) {
-					// this point is on the border of the map
-					continue;
-				}
-				
-				if (map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i][j+1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val()) {
-					
-					// all neighbors are at least 0.01m higher
-					// ==> qualifies as basin
-					map[i][j].flagAsBasin();
-					basinCount++;
-				}
-
-			}
-		}
+	private boolean passBasinCheck(int i, int j) {
+		boolean pass = 
+				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i][j+1].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
+				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val();
+		 
+		return pass;
 	}
 	
 	/**
-	 * <p>Overloaded findBasins method. This can be called to process the 
-	 * entire map sequentially.</p>
+	 * <p>Iterates through the part of the map specified by the
+	 * object's indexes and flags points that meet basin criteria.</p>
 	 */
 	public void findBasins() {
-		/* NOTE:
-		 * Could exclude borders from the for loop here but i want the
-		 * parallel execution and sequential execution to process the
-		 * same number of points, for comparison.
-		 */
-		for (int i=0; i<map.length; i++) { // iterate through rows
-			for (int j=0; j<map[0].length; j++) { // iterate through columns
+		for (int i=ilo; i<ihi; i++) {
+			for (int j=jlo; j<jhi; j++) {
 				
 				if (i==0 || i==map.length || j==0 || j==map[0].length) {
-					// this point is on the border of the map
+					// point is on the border of the map
 					continue;
 				}
 				
-				if (map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i][j+1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
-						map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val()) {
-					
-					// all neighbors are at least 0.01m higher
-					// ==> qualifies as basin
+				if (passBasinCheck(i,j)) {
+					// point qualifies as basin
 					map[i][j].flagAsBasin();
 					basinCount++;
 				}
-
 			}
 		}
 	}
 	
 	/**
-	 * Collates Basin/NotBasin data into an array containing the coords
-	 * of each basin
+	 * <p>Collates flagged basins into an array containing the coords
+	 * of each basin.</p>
 	 * 
 	 * @return List of basin coords
 	 */
@@ -157,12 +134,8 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		int[][] list = new int[basinCount][2];
 		int l=0; // list index
 		
-		// for loop indexes exclude borders (automatically NotBasin)
-		int ilo=1, jlo=1;
-		int ihi=map.length-1, jhi=map[0].length-1;
-		
-		for (int i=ilo; i<ihi; i++) { // iterate through rows
-			for (int j=jlo; j<jhi; j++) { // iterate through columns
+		for (int i=0; i<map.length; i++) {
+			for (int j=0; j<map.length; j++) {
 				if (map[i][j].isBasin()) {
 					list[l][0] = i;
 					list[l][1] = j;
@@ -170,59 +143,76 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 				}
 			}
 		}
+		
 		return list;
 	}
 	
+	/**
+	 * <p>Finds basins in parallel. A divide-and-conquer algorithm
+	 * is used to perform findBasins() on small bits of the map in
+	 * parallel.</p>
+	 */
+	@Override
 	public Integer compute() {
-		int num_rows = idxs[2]-idxs[0];
-		int num_cols = idxs[3]-idxs[1];
-		if ( (num_rows*num_cols) < SEQUENTIAL_CUTOFF) {
-			findBasins(idxs[0], idxs[1], idxs[2], idxs[3]);
+		int num_rows = ihi-ilo;
+		int num_cols = jhi-jlo;
+		
+		if ((num_rows*num_cols) < SEQUENTIAL_CUTOFF) {
+			findBasins(); // do sequentially
 			return basinCount;
 		}
 		
 		else {
-			// decide how to divide portion of map marked by idxs
-			int i_cut, j_cut;
+			// Spawn branches
+			ElevationAnalysis b1;
+			ElevationAnalysis b2;
+			
+			// divide portion of map by halving longest 'side'
 			if (num_rows >= num_cols) {
-				i_cut = idxs[2]/2;
-				j_cut = idxs[3];
+				b1 = new ElevationAnalysis(ilo, jlo, (ilo+ihi)/2, jhi);
+				b2 = new ElevationAnalysis((ilo+ihi)/2, jlo, ihi, jhi); 
 			}
-			else {
-				i_cut = idxs[2];
-				j_cut = idxs[3]/2;
+			else { // num_cols > num_rows
+				b1 = new ElevationAnalysis(ilo, jlo, ihi, (jlo+jhi)/2);
+				b2 = new ElevationAnalysis(ilo, (jlo+jhi)/2, ihi, jhi);
 			}
 			
-			// spawn branches
-			ElevationAnalysis left = new ElevationAnalysis(idxs[0], idxs[1], i_cut, j_cut);
-			ElevationAnalysis right = new ElevationAnalysis(i_cut, j_cut, idxs[0], idxs[1]);
+			b1.fork();
+			int b2Ans = b2.compute();
+			int b1Ans = b1.join();
 			
-			left.fork();
-			int rightnum = right.compute();
-			int leftnum = left.join();
-			
-			return leftnum+rightnum;
+			return b1Ans+b2Ans;
 		}
-		
 	}
 	
 	/**
-	 * Accessor
-	 * @return number of basins found in data
+	 * <p>Accessor for basinCount.</p>
+	 * @return Number of basins found in data
 	 */
 	public int basinCount() {
 		return basinCount;
 	}
 	
 	/**
-	 * <p>(Re)sets static map. Use with caution.</p>
-	 * @param m PointElevation array to assign to ElevationAnalysis.map
+	 * <p>Clears flags on all points in the map.</p> 
 	 */
-	public void setmap(PointElevation[][] m) {
-		ElevationAnalysis.map = m;
-		System.out.println("Warning: ElevationAnalysis.map has been reset.");
+	public void clearFlags() {
+		for (int i=0; i<map.length; i++) {
+			for (int j=0; j<map[0].length; j++) {
+				map[i][j].clearFlag();
+			}
+		}
 	}
+	
 }
+
+
+
+
+
+
+
+
 
 
 

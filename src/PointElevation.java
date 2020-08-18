@@ -22,6 +22,10 @@ public class PointElevation {
 		isBasin = true;
 	}
 	
+	public void clearFlag() {
+		isBasin = false;
+	}
+	
 	public boolean isBasin() {
 		return isBasin;
 	}
