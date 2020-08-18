@@ -1,3 +1,5 @@
+import java.util.concurrent.ForkJoinPool;
+
 /**
  * <p>Contains <code>main</code> method to interface with user and 
  * implement functionality of {@link ElevationAnalysis} class.</p>
@@ -7,6 +9,7 @@
  */
 public class TerrainClassify {
 	private static ElevationAnalysis analyze;
+	private static ForkJoinPool fjPool = new ForkJoinPool();
 	private static double t_tick;
 	
 	public static void main(String[] args) {
@@ -17,8 +20,10 @@ public class TerrainClassify {
 		String outfile = opp+args[1];
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
-		analyze.findBasins();
-		MyFiles.compileTerrainData(analyze.basinCount(), analyze.listBasins(), outfile);
+		
+		int num_basins = fjPool.invoke(new ElevationAnalysis());
+		
+		MyFiles.compileTerrainData(num_basins, analyze.listBasins(), outfile);
 	}
 	
 	/**

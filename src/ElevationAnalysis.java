@@ -67,6 +67,19 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	}
 	
 	/**
+	 * <p>Creates new ElevationAnalysis object with loop indices set to
+	 * cover the whole grid. Map is unchanged.</p>
+	 */
+	ElevationAnalysis() {
+		basinCount = 0;
+		
+		ilo = 0;
+		jlo = 0;
+		ihi = map.length;
+		jhi = map[0].length;
+	}
+	
+	/**
 	 * <p>Creates a new ElevationAnalysis object with loop indexes 
 	 * given by the values passed in. Map is unchanged.</p>
 	 * 
@@ -181,7 +194,8 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 			int b2Ans = b2.compute();
 			int b1Ans = b1.join();
 			
-			return b1Ans+b2Ans;
+			basinCount = b1Ans+b2Ans;
+			return basinCount;
 		}
 	}
 	
