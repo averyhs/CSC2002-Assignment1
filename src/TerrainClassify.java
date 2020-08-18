@@ -13,17 +13,19 @@ public class TerrainClassify {
 	private static double t_tick;
 	
 	public static void main(String[] args) {
-		String ipp = "../io-files/"; // input file path prefix
-		String opp = "../io-files/"; // output file path prefix
-		
-		String infile = ipp+args[0];
-		String outfile = opp+args[1];
+//		String ipp = "../io-files/"; // input file path prefix
+//		String opp = "../io-files/"; // output file path prefix
+//		
+//		String infile = ipp+args[0];
+//		String outfile = opp+args[1];
+		String infile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/trivialbasin_in.txt";
+		String outfile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/trivialbasin_out.txt";
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
 		int num_basins = fjPool.invoke(new ElevationAnalysis());
 		
-		MyFiles.compileTerrainData(num_basins, analyze.listBasins(), outfile);
+		MyFiles.compileTerrainData(num_basins, ElevationAnalysis.listBasins(num_basins), outfile);
 	}
 	
 	/**
