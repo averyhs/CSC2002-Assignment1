@@ -8,11 +8,9 @@
 public class PointElevation {
 	private float elevation;
 	private boolean isBasin;
-	private boolean isNotBasin;
 	
 	PointElevation(float elevation) {
 		this.isBasin = false;
-		this.isNotBasin = false;
 		this.elevation = elevation;
 	}
 	
