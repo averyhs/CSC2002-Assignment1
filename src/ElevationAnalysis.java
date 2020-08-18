@@ -56,19 +56,6 @@ public class ElevationAnalysis extends RecursiveTask<int[][]> {
 					// ==> qualifies as basin
 					map[i][j].flagAsBasin();
 					basinCount++;
-					
-					/* NOTE:
-					 * In purely sequential version of this class, once
-					 * a point was flagged as Basin, all of its neighbors
-					 * were flagged as NotBasin. I was thinking it may 
-					 * introduce some bad concurrency if i tried to do it 
-					 * in a simple parallel implementation, so i scrapped
-					 * it. But it's something to try again.
-					 * 
-					 * I won't do that now, so i can get a good comparison, 
-					 * but i'll put the sequential version as a git branch 
-					 * for reference to that version of the method
-					 */
 				}
 
 			}
