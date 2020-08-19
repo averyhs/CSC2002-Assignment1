@@ -8,7 +8,7 @@ import java.util.concurrent.ForkJoinPool;
  *
  */
 public class TerrainClassify {
-	private static ElevationAnalysis analyze;
+	private static ElevationAnalysis analyze; // redundant for parallel, needed for sequential
 	private static ForkJoinPool fjPool = new ForkJoinPool();
 	private static double t_tick;
 	
@@ -18,8 +18,8 @@ public class TerrainClassify {
 //		
 //		String infile = ipp+args[0];
 //		String outfile = opp+args[1];
-		String infile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/trivialbasin_in.txt";
-		String outfile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/trivialbasin_out.txt";
+		String infile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/small_in.txt";
+		String outfile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/small_out.txt";
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
