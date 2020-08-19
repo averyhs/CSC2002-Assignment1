@@ -13,13 +13,11 @@ public class TerrainClassify {
 	private static double t_tick;
 	
 	public static void main(String[] args) {
-//		String ipp = "../io-files/"; // input file path prefix
-//		String opp = "../io-files/"; // output file path prefix
-//		
-//		String infile = ipp+args[0];
-//		String outfile = opp+args[1];
-		String infile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/small_in.txt";
-		String outfile = "/home/avk/Documents/2020/CSC2002/CSC2002-Workspace/CSC2002-Assignment1/io-files/small_out.txt";
+		String ipp = "../io-files/"; // input file path prefix
+		String opp = "../io-files/"; // output file path prefix
+		
+		String infile = ipp+args[0];
+		String outfile = opp+args[1];
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
