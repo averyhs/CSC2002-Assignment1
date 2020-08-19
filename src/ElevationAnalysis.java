@@ -123,7 +123,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		for (int i=ilo; i<ihi; i++) {
 			for (int j=jlo; j<jhi; j++) {
 				
-				if (i==0 || i==map.length || j==0 || j==map[0].length) {
+				if (i==0 || i==map.length-1 || j==0 || j==map[0].length-1) {
 					// point is on the border of the map
 					continue;
 				}
@@ -141,22 +141,22 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * <p>Collates flagged basins into an array containing the coords
 	 * of each basin.</p>
 	 * 
+	 * @param basinCount Number of basins
 	 * @return List of basin coords
 	 */
-	public int[][] listBasins() {
+	public static int[][] listBasins(int basinCount) {
 		int[][] list = new int[basinCount][2];
 		int l=0; // list index
 		
-		for (int i=0; i<map.length; i++) {
-			for (int j=0; j<map.length; j++) {
-				if (map[i][j].isBasin()) {
+		for (int i=0; i<ElevationAnalysis.map.length; i++) {
+			for (int j=0; j<ElevationAnalysis.map.length; j++) {
+				if (ElevationAnalysis.map[i][j].isBasin()) {
 					list[l][0] = i;
 					list[l][1] = j;
 					l++;
 				}
 			}
 		}
-		
 		return list;
 	}
 	
@@ -167,6 +167,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 */
 	@Override
 	public Integer compute() {
+		
 		int num_rows = ihi-ilo;
 		int num_cols = jhi-jlo;
 		
@@ -197,14 +198,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 			basinCount = b1Ans+b2Ans;
 			return basinCount;
 		}
-	}
-	
-	/**
-	 * <p>Accessor for basinCount.</p>
-	 * @return Number of basins found in data
-	 */
-	public int basinCount() {
-		return basinCount;
 	}
 	
 	/**

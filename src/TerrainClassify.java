@@ -8,7 +8,7 @@ import java.util.concurrent.ForkJoinPool;
  *
  */
 public class TerrainClassify {
-	private static ElevationAnalysis analyze;
+	private static ElevationAnalysis analyze; // redundant for parallel, needed for sequential
 	private static ForkJoinPool fjPool = new ForkJoinPool();
 	private static double t_tick;
 	
@@ -23,7 +23,7 @@ public class TerrainClassify {
 		
 		int num_basins = fjPool.invoke(new ElevationAnalysis());
 		
-		MyFiles.compileTerrainData(num_basins, analyze.listBasins(), outfile);
+		MyFiles.compileTerrainData(num_basins, ElevationAnalysis.listBasins(num_basins), outfile);
 	}
 	
 	/**
