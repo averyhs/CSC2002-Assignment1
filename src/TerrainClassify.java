@@ -13,11 +13,8 @@ public class TerrainClassify {
 	private static double t_tick;
 	
 	public static void main(String[] args) {
-		String ipp = "../io-files/"; // input file path prefix
-		String opp = "../io-files/"; // output file path prefix
-		
-		String infile = ipp+args[0];
-		String outfile = opp+args[1];
+		String infile = args[0];
+		String outfile = args[1];
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
