@@ -92,9 +92,9 @@ class MyFiles {
 		}
 	}
 	
-	public static void compileTestData(int[][] data, int[] seqCutoffs, String dataSize, String seqPar) {
+	public static void compileTestData(long[][] data, int[] seqCutoffs, String dataSize, String seqPar) {
 //		String path = "";
-		String filename = seqPar + "_" + dataSize + "-data" + ".txt";
+		String filename = seqPar + "_" + dataSize + ".txt";
 		try {
 			File f = new File(filename);
 			
