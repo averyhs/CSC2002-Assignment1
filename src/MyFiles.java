@@ -92,9 +92,15 @@ class MyFiles {
 		}
 	}
 	
-	public static void compileTestData(long[][] data, int[] seqCutoffs, String dataSize, String seqPar) {
-//		String path = "";
-		String filename = seqPar + "_" + dataSize + ".txt";
+	public static void compileTestData(long[][] data, int[] seqCutoffs, String dataSize, String seqPar, boolean usePathPrefix) {
+		/* FIXME:
+		 * How can this file always be put in to ROOT/io-files?
+		 */
+		String pp;
+		if (usePathPrefix) {pp="io-files/";}
+		else {pp="";}
+		
+		String filename = pp + seqPar + "_" + dataSize + ".txt";
 		try {
 			File f = new File(filename);
 			

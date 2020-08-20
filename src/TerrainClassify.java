@@ -48,8 +48,8 @@ public class TerrainClassify {
 		}
 		
 		String dataSize = ElevationAnalysis.getMapdims()[0]+"x"+ElevationAnalysis.getMapdims()[1];
-		MyFiles.compileTestData(seqTimes, cutoffs, dataSize, "sequential");
-		MyFiles.compileTestData(parTimes, cutoffs, dataSize, "parallel");
+		MyFiles.compileTestData(seqTimes, cutoffs, dataSize, "sequential", true);
+		MyFiles.compileTestData(parTimes, cutoffs, dataSize, "parallel", true);
 	}
 	
 	/**
