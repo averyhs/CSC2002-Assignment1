@@ -13,6 +13,12 @@ public class TerrainClassify {
 	private static double t_tick;
 	
 	public static void main(String[] args) {
+		// variables & storage arrays for speed tests:
+		int n = 20; // number of times to run speed tests
+		int p = 5; // number of sequential cutoffs to test at
+		double[][] seq_times = new double[p][n];
+		double[][] par_times = new double[p][n];
+		
 		String infile = args[0];
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
@@ -25,17 +31,17 @@ public class TerrainClassify {
 		 * Fine version:
 		 * seq cutoff increases by constant step
 		 */
-		for (int p=0; p<=4; p++) { // increment power of 10
+		for (int c=0; c<p; c++) { // increment cutoff p times
 			ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,p)));
-			for (int n=0; n<20; n++) { // run 20 tests
+			for (int i=0; i<n; i++) { // run n tests
 				ElevationAnalysis.clearFlags();
 				tick();
 				analyze.findBasins(); // sequential
-				tock();
+				seq_times[c][i] = tock();
 				ElevationAnalysis.clearFlags();
 				tick();
 				fjPool.invoke(new ElevationAnalysis()); // parallel
-				tock();
+				par_times[c][i] = tock();
 			}
 		}
 	}
