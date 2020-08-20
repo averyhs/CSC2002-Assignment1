@@ -16,19 +16,28 @@ public class TerrainClassify {
 		String infile = args[0];
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
-//		// TEST 1
-//		ElevationAnalysis.setSequentialCutoff(5);
-//		// for
-//		ElevationAnalysis.clearFlags();
-//		tick();
-//		analyze.findBasins();
-		
-		
-		
-		
-		
-		fjPool.invoke(new ElevationAnalysis());
-		
+		/*
+		 * Test 20 times for each sequential cutoff (~ number of threads)
+		 * 
+		 * Coarse version:
+		 * seq cutoff increases in orders of magnitude
+		 * 
+		 * Fine version:
+		 * seq cutoff increases by constant step
+		 */
+		for (int p=0; p<=4; p++) { // increment power of 10
+			ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,p)));
+			for (int n=0; n<20; n++) { // run 20 tests
+				ElevationAnalysis.clearFlags();
+				tick();
+				analyze.findBasins(); // sequential
+				tock();
+				ElevationAnalysis.clearFlags();
+				tick();
+				fjPool.invoke(new ElevationAnalysis()); // parallel
+				tock();
+			}
+		}
 	}
 	
 	/**
