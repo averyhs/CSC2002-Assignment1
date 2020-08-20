@@ -20,36 +20,48 @@ public class TerrainClassify {
 		long[][] parTimes = new long[p][n];
 		int[] cutoffs = new int[p];
 		
+		// IO files
 		String infile = args[0];
+		String outfile = args[1];
+		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
-		/*
-		 * Test 20 times for each sequential cutoff (~ number of threads)
-		 * 
-		 * Coarse version:
-		 * seq cutoff increases in orders of magnitude
-		 * 
-		 * Fine version:
-		 * seq cutoff increases by constant step
-		 */
-		for (int c=0; c<p; c++) { // increment cutoff p times
-			ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
-			cutoffs[c] = (int)(5*Math.pow(10,c));
-			for (int i=0; i<n; i++) { // run n tests
+		if (args.length>2) {
+			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
+				/*
+				 * Test 20 times for each sequential cutoff (~ number of threads)
+				 * 
+				 * Coarse version:
+				 * seq cutoff increases in orders of magnitude
+				 * 
+				 * Fine version:
+				 * seq cutoff increases by constant step
+				 */
+				for (int c=0; c<p; c++) { // increment cutoff p times
+					ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
+					cutoffs[c] = (int)(5*Math.pow(10,c));
+					for (int i=0; i<n; i++) { // run n tests
+						ElevationAnalysis.clearFlags();
+						tick();
+						analyze.findBasins(); // sequential
+						seqTimes[c][i] = tock();
+						ElevationAnalysis.clearFlags();
+						tick();
+						fjPool.invoke(new ElevationAnalysis()); // parallel
+						parTimes[c][i] = tock();
+					}
+				}
 				ElevationAnalysis.clearFlags();
-				tick();
-				analyze.findBasins(); // sequential
-				seqTimes[c][i] = tock();
-				ElevationAnalysis.clearFlags();
-				tick();
-				fjPool.invoke(new ElevationAnalysis()); // parallel
-				parTimes[c][i] = tock();
+				
+				String dataSize = ElevationAnalysis.getMapdims()[0]+"x"+ElevationAnalysis.getMapdims()[1];
+				MyFiles.compileTestData(seqTimes, cutoffs, dataSize, "sequential", true);
+				MyFiles.compileTestData(parTimes, cutoffs, dataSize, "parallel", true);
 			}
 		}
 		
-		String dataSize = ElevationAnalysis.getMapdims()[0]+"x"+ElevationAnalysis.getMapdims()[1];
-		MyFiles.compileTestData(seqTimes, cutoffs, dataSize, "sequential", true);
-		MyFiles.compileTestData(parTimes, cutoffs, dataSize, "parallel", true);
+		// Produce list of basin coords
+		int num_basins = fjPool.invoke(new ElevationAnalysis());
+		MyFiles.compileTerrainData(num_basins, ElevationAnalysis.listBasins(num_basins), outfile);
 	}
 	
 	/**
