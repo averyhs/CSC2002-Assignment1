@@ -91,4 +91,44 @@ class MyFiles {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void compileTestData(double[][] data, int[] seqCutoffs, String dataSize, String seqPar) {
+//		String path = "";
+		String filename = seqPar + "_" + dataSize + "-data" + ".txt";
+		try {
+			File f = new File(filename);
+			
+			if (f.createNewFile()) {} // create file
+			else { // file already exists
+				FileWriter wTemp = new FileWriter(f);
+				wTemp.write(""); // clear file
+				wTemp.close();
+			}
+			
+			FileWriter w = new FileWriter(f, true);
+			w.write("# Speed Test Data\n# Units: ns\n# Process: "+seqPar+"\n# Data size: "+dataSize+"\n");
+			
+			for (int c=0; c<data.length; c++) {
+				w.write("\n# Sequential cutoff: "+seqCutoffs[c]+"\n");
+				for (int i=0; i<data[0].length; i++) {
+					w.write(data[c][i] + "\n");
+				}
+			}
+			
+			w.close();
+		}
+		catch(IOException e) { // very general exception handling
+			
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+

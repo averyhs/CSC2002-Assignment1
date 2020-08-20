@@ -16,8 +16,9 @@ public class TerrainClassify {
 		// variables & storage arrays for speed tests:
 		int n = 20; // number of times to run speed tests
 		int p = 5; // number of sequential cutoffs to test at
-		double[][] seq_times = new double[p][n];
-		double[][] par_times = new double[p][n];
+		double[][] seqTimes = new double[p][n];
+		double[][] parTimes = new double[p][n];
+		int[] cutoffs = new int[p];
 		
 		String infile = args[0];
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
@@ -32,33 +33,36 @@ public class TerrainClassify {
 		 * seq cutoff increases by constant step
 		 */
 		for (int c=0; c<p; c++) { // increment cutoff p times
-			ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,p)));
+			ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
+			cutoffs[c] = (int)(5*Math.pow(10,c));
 			for (int i=0; i<n; i++) { // run n tests
 				ElevationAnalysis.clearFlags();
 				tick();
 				analyze.findBasins(); // sequential
-				seq_times[c][i] = tock();
+				seqTimes[c][i] = tock();
 				ElevationAnalysis.clearFlags();
 				tick();
 				fjPool.invoke(new ElevationAnalysis()); // parallel
-				par_times[c][i] = tock();
+				parTimes[c][i] = tock();
 			}
 		}
+		
+		//MyFiles.compileTestData(seqTimes, cutoffs, "small", "sequential");
 	}
 	
 	/**
-	 * <p>Records the current time (stored in static field)</p>
+	 * <p>Records the current time (stored in static field).</p>
 	 */
 	private static void tick() {
-		t_tick = System.currentTimeMillis();
+		t_tick = System.nanoTime();
 	}
 	
 	/**
 	 * <p>Calculates and returns the time elapsed since 
-	 * the last tick() call</p>
+	 * the last tick() call.</p>
 	 * @return Elapsed time in ms
 	 */
 	private static double tock() {
-		return System.currentTimeMillis() - t_tick;
+		return System.nanoTime()-t_tick;
 	}
 }
