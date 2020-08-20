@@ -212,6 +212,13 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		}
 	}
 	
+	/**
+	 * <p>Get the dimensions of the map.</p>
+	 * @return int array containing {length, width}
+	 */
+	public static int[] getMapdims() {
+		return new int[] {map.length, map[0].length};
+	}
 }
 
 
