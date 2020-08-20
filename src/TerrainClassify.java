@@ -14,13 +14,11 @@ public class TerrainClassify {
 	
 	public static void main(String[] args) {
 		String infile = args[0];
-		String outfile = args[1];
 		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
 		
-		int num_basins = fjPool.invoke(new ElevationAnalysis());
+		fjPool.invoke(new ElevationAnalysis());
 		
-		MyFiles.compileTerrainData(num_basins, ElevationAnalysis.listBasins(num_basins), outfile);
 	}
 	
 	/**
