@@ -33,7 +33,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * <p>The cutoff for amount of data points processed in 
 	 * parallel. Below this point, processing is sequential.</p>
 	 */
-	private static final int SEQUENTIAL_CUTOFF = 500;
+	private static int SequentialCutoff = 500;
 	
 	/**
 	 * <p>A grid of point elevations, the data to be analyzed.</p>
@@ -171,7 +171,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		int num_rows = ihi-ilo;
 		int num_cols = jhi-jlo;
 		
-		if ((num_rows*num_cols) < SEQUENTIAL_CUTOFF) {
+		if ((num_rows*num_cols) < SequentialCutoff) {
 			findBasins(); // do sequentially
 			return basinCount;
 		}
@@ -198,6 +198,15 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 			basinCount = b1Ans+b2Ans;
 			return basinCount;
 		}
+	}
+	
+	/**
+	 * <p>Set the sequential cutoff value for the class.</p>
+	 * 
+	 * @param cutoff New sequential cutoff value
+	 */
+	public static void setSequentialCutoff(int cutoff) {
+		SequentialCutoff = cutoff;
 	}
 	
 	/**
