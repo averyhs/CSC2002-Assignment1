@@ -10,14 +10,14 @@ import java.util.concurrent.ForkJoinPool;
 public class TerrainClassify {
 	private static ElevationAnalysis analyze; // redundant for parallel, needed for sequential
 	private static ForkJoinPool fjPool = new ForkJoinPool();
-	private static double t_tick;
+	private static int t_tick;
 	
 	public static void main(String[] args) {
 		// variables & storage arrays for speed tests:
 		int n = 20; // number of times to run speed tests
 		int p = 5; // number of sequential cutoffs to test at
-		double[][] seqTimes = new double[p][n];
-		double[][] parTimes = new double[p][n];
+		int[][] seqTimes = new int[p][n];
+		int[][] parTimes = new int[p][n];
 		int[] cutoffs = new int[p];
 		
 		String infile = args[0];
@@ -54,7 +54,10 @@ public class TerrainClassify {
 	 * <p>Records the current time (stored in static field).</p>
 	 */
 	private static void tick() {
-		t_tick = System.nanoTime();
+		t_tick = Math.toIntExact(System.nanoTime());
+		/* nanoTime returns long, but in this application, the times will
+		 * be small enough for int
+		 */
 	}
 	
 	/**
@@ -62,7 +65,7 @@ public class TerrainClassify {
 	 * the last tick() call.</p>
 	 * @return Elapsed time in ms
 	 */
-	private static double tock() {
-		return System.nanoTime()-t_tick;
+	private static int tock() {
+		return Math.toIntExact(System.nanoTime()-t_tick);
 	}
 }
