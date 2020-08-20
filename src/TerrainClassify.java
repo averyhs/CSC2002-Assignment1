@@ -14,8 +14,18 @@ public class TerrainClassify {
 	
 	public static void main(String[] args) {
 		String infile = args[0];
-		
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
+		
+//		// TEST 1
+//		ElevationAnalysis.setSequentialCutoff(5);
+//		// for
+//		ElevationAnalysis.clearFlags();
+//		tick();
+//		analyze.findBasins();
+		
+		
+		
+		
 		
 		fjPool.invoke(new ElevationAnalysis());
 		

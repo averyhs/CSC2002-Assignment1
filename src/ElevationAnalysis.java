@@ -47,7 +47,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	private static PointElevation[][] map = null;
 	
 	int ilo, jlo, ihi, jhi; // indexes for for loops
-	int basinCount;
 	
 	/**
 	 * <p>Creates a new ElevationAnalysis object with map data given
@@ -62,8 +61,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	ElevationAnalysis(PointElevation[][] m) {
 		map = m;
 		System.out.println("Warning: ElevationAnalysis.map has been reset.");
-		
-		basinCount = 0;
 	}
 	
 	/**
@@ -71,8 +68,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * cover the whole grid. Map is unchanged.</p>
 	 */
 	ElevationAnalysis() {
-		basinCount = 0;
-		
 		ilo = 0;
 		jlo = 0;
 		ihi = map.length;
@@ -89,8 +84,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * @param jhi Ending col index
 	 */
 	ElevationAnalysis(int ilo, int jlo, int ihi, int jhi) {
-		basinCount = 0;
-		
 		this.ilo = ilo;
 		this.jlo = jlo;
 		this.ihi = ihi;
@@ -119,7 +112,8 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * <p>Iterates through the part of the map specified by the
 	 * object's indexes and flags points that meet basin criteria.</p>
 	 */
-	public void findBasins() {
+	public int findBasins() {
+		int basinCount = 0;
 		for (int i=ilo; i<ihi; i++) {
 			for (int j=jlo; j<jhi; j++) {
 				
@@ -127,7 +121,6 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 					// point is on the border of the map
 					continue;
 				}
-				
 				if (passBasinCheck(i,j)) {
 					// point qualifies as basin
 					map[i][j].flagAsBasin();
@@ -135,6 +128,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 				}
 			}
 		}
+		return basinCount;
 	}
 	
 	/**
@@ -172,8 +166,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		int num_cols = jhi-jlo;
 		
 		if ((num_rows*num_cols) < SequentialCutoff) {
-			findBasins(); // do sequentially
-			return basinCount;
+			return findBasins(); // do sequentially
 		}
 		
 		else {
@@ -195,8 +188,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 			int b2Ans = b2.compute();
 			int b1Ans = b1.join();
 			
-			basinCount = b1Ans+b2Ans;
-			return basinCount;
+			return b1Ans+b2Ans;
 		}
 	}
 	
