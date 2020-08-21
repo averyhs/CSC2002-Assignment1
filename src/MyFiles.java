@@ -104,48 +104,61 @@ class MyFiles {
 	}
 	
 	/**
-	 * <p>Writes speed test data to file.</p>
+	 * <p>Writes speed test data to two files: one for reading and one
+	 * to use for plotting.</p>
 	 * 
 	 * @param data
 	 * @param seqCutoffs
 	 * @param seqPar
 	 * @param usePathPrefix
 	 */
-	public static void compileTestData(double[][] data, int[] seqCutoffs, String seqPar, boolean usePathPrefix) {
+	public static void compileTestData(double[][] dataSeq, double[][] dataPar, int[] seqCutoffs, boolean usePathPrefix) {
 		/* FIXME:
 		 * How can this file always be put in to ROOT/io-files?
 		 */
-		String pp;
+		String pp; // path prefix
 		if (usePathPrefix) {pp="io-files/";}
 		else {pp="";}
 		
-		String dataSize = dataDims[0]+"x"+dataDims[1];
+		String dataSize = dataDims[0]+"x"+dataDims[1]; // dimensions of data, <row>x<col>
 		
-		String filename = pp + dataSize + "_" + seqPar + ".txt";
+		
+		String filenameSeq = pp + dataSize + "_benchmarking" + ".txt";
 		
 		try {
-			File f = new File(filename);
+			File f = new File(filenameSeq); // file
 			
-			if (f.createNewFile()) {} // create file
-			else { // file already exists
-				FileWriter wTemp = new FileWriter(f);
-				wTemp.write(""); // clear file
-				wTemp.close();
-			}
-			
-			FileWriter w = new FileWriter(f, true);
-			w.write("# Speed Test Data\n# Units: ns\n# Process: "+seqPar+"\n# Data size: "+dataSize+"\n");
-			
-			for (int c=0; c<data.length; c++) {
-				w.write("\n# Sequential cutoff: "+seqCutoffs[c]+"\n");
-				w.write("# min: "+trunc(Stats.min(data[c]),8)+
-						"\n# max: "+trunc(Stats.max(data[c]),8)+
-						"\n# mean: "+trunc(Stats.mean(data[c]),8)+"\n");
-				for (int i=0; i<data[0].length; i++) {
-					w.write(trunc(data[c][i],8) + "\n");
+			// if file doesn't exist, create it
+			// if file does exist, clear it
+			if (f.createNewFile()) {}
+			else {
+				try {
+					FileWriter wTemp = new FileWriter(f);
+					wTemp.write(""); // clear file
+					wTemp.close();
+				}
+				catch(IOException e) { // very general exception handling
+					e.printStackTrace();
 				}
 			}
 			
+			// create writer
+			FileWriter w = new FileWriter(f, true);
+			
+			// write header
+			w.write("# Speed Test Data\n# Units: ms\n# Data size: "+dataSize+"\n# format: <SequentialTime>  <ParallelTime>\n");
+			
+			// write data (// with no errors, dataPar.length==dataSeq.length)
+			for (int c=0; c<dataPar.length; c++) {
+				w.write("\n# Sequential cutoff: "+seqCutoffs[c]+"\n");
+				w.write(String.format("# min: %s, %s",trunc(Stats.min(dataSeq[c]),8),trunc(Stats.min(dataPar[c]),8))+
+						String.format("\n# max: %s, %s",trunc(Stats.max(dataSeq[c]),8),trunc(Stats.max(dataPar[c]),8))+
+						String.format("\n# mean: %s, %s\n",trunc(Stats.mean(dataSeq[c]),8),trunc(Stats.mean(dataPar[c]),8)));
+				for (int i=0; i<dataPar[0].length; i++) {
+					w.write(String.format("%-12s%-8s\n",trunc(dataSeq[c][i],8),trunc(dataPar[c][i],8)));
+				}
+			}
+			// close writer
 			w.close();
 		}
 		catch(IOException e) { // very general exception handling

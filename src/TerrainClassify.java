@@ -54,8 +54,7 @@ public class TerrainClassify {
 				}
 				ElevationAnalysis.clearFlags();
 				
-				MyFiles.compileTestData(seqTimes, cutoffs, "sequential", true);
-				MyFiles.compileTestData(parTimes, cutoffs, "parallel", true);
+				MyFiles.compileTestData(seqTimes, parTimes, cutoffs, true);
 			}
 		}
 		
