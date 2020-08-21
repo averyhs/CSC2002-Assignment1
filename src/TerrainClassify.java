@@ -28,6 +28,11 @@ public class TerrainClassify {
 		
 		if (args.length>2) {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
+				// 'warm-up'
+				for (int i=0; i<100; i++) { // num loops based on experimentation
+					fjPool.invoke(new ElevationAnalysis());
+				}
+				
 				/*
 				 * Test 20 times for each sequential cutoff (~ number of threads)
 				 * 
@@ -36,7 +41,7 @@ public class TerrainClassify {
 				 * 
 				 * Fine version:
 				 * seq cutoff increases by constant step
-				 */
+				 */				
 				for (int c=0; c<p; c++) { // increment cutoff p times
 					ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
 					cutoffs[c] = (int)(5*Math.pow(10,c));
