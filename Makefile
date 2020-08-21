@@ -35,4 +35,7 @@ clean:
 clean-docs:
 	rm -rf ${DOCDIR}/*
 
-.PHONY: default all compile docs clean clean-docs
+run:
+	./run.sh
+
+.PHONY: default all run compile docs clean clean-docs
