@@ -77,16 +77,7 @@ class MyFiles {
 			File outFile = new File(filename);
 			
 			// create file if it doesn't exist
-			if (outFile.createNewFile()) {
-				System.out.println("File "+filename+" created.");
-			}
-			else {
-				System.out.println("File "+filename+" found.");
-				if (outFile.length() != 0L) { // check if file is empty
-					System.out.println("File "+filename+" not empty. "
-							+ "Contents will be overwritten.");
-				}
-			}
+			outFile.createNewFile();
 			
 			FileWriter outWriter = new FileWriter(filename);
 			
