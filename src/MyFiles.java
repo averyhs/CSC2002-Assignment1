@@ -11,15 +11,29 @@ import java.io.IOException;
  *
  */
 class MyFiles {
+	
+	/**
+	 * <p>Dimensions of terrain data grid of input file.</p>
+	 */
+	private static int[] dataDims = new int[2];
+	
+	/**
+	 * <p>Accessor for dataDims (dimensions of terrain data).</p>
+	 * @return [num_rows, num_cols]
+	 */
+	public static int[] getDataDims() {
+		return dataDims;
+	}
+	
 	/**
 	 * <p>Reads terrain data from a file in format shown below. Data is written into
-	 * a {@link PointElevation} array.</p>
+	 * a {@link PointElevation} array. Stores dimensions of the grid of data to dataDims field.</p>
 	 * <p> Required file format:<br> <terrain num rows – INT> <terrain num cols – INT> <br>
 	 * <height at grid pos (0,0) - FLOAT> <height at grid pos (0,1) - FLOAT> ... etc.</p>
 	 * @param filename
-	 * @return PointElevation grid with data from file
+	 * @return PointElevation array with data from file
 	 */
-	public static PointElevation[][] extractTerrainData(String filename) {
+	public static PointElevation[] extractTerrainData(String filename) {
 		try {
 			// IO objects
 			File inFile = new File(filename);
@@ -30,21 +44,18 @@ class MyFiles {
 			 */
 			
 			// get dimensions
-			int rows = inScanner.nextInt();
-			int cols = inScanner.nextInt();
+			dataDims[0] = inScanner.nextInt();
+			dataDims[1] = inScanner.nextInt();
 			
 			// create empty grid with dims
-			PointElevation[][] grid = new PointElevation[rows][cols];
+			PointElevation[] map = new PointElevation[dataDims[0]*dataDims[1]];
 			
 			// populate grid
-			for (int i=0; i<rows; i++) {
-				for (int j=0; j<cols; j++) {
-					grid[i][j] = new PointElevation(inScanner.nextFloat());
-				}
+			for (int i=0; i<dataDims[0]*dataDims[1]; i++) {
+				map[i] = new PointElevation(inScanner.nextFloat());
 			}
-			
 			inScanner.close();
-			return grid;
+			return map;
 		}
 		catch(FileNotFoundException e) { // very general exception handling
 			System.out.println("Error opening or reading file "+filename);
@@ -55,7 +66,7 @@ class MyFiles {
 	
 	/**
 	 * <p>Writes basin data to output file with the given name.</p>
-	 * <p>Note that if the file already exists, it must be empty</p>
+	 * <p>Note that if the file already exists, it will be overwritten.</p>
 	 * 
 	 * @param total Total number of basins listed
 	 * @param coords List of coordinates for each basin
@@ -92,7 +103,15 @@ class MyFiles {
 		}
 	}
 	
-	public static void compileTestData(long[][] data, int[] seqCutoffs, String dataSize, String seqPar, boolean usePathPrefix) {
+	/**
+	 * <p>Writes speed test data to file.</p>
+	 * 
+	 * @param data
+	 * @param seqCutoffs
+	 * @param seqPar
+	 * @param usePathPrefix
+	 */
+	public static void compileTestData(long[][] data, int[] seqCutoffs, String seqPar, boolean usePathPrefix) {
 		/* FIXME:
 		 * How can this file always be put in to ROOT/io-files?
 		 */
@@ -100,7 +119,10 @@ class MyFiles {
 		if (usePathPrefix) {pp="io-files/";}
 		else {pp="";}
 		
-		String filename = pp + seqPar + "_" + dataSize + ".txt";
+		String dataSize = dataDims[0]+"x"+dataDims[1];
+		
+		String filename = pp + dataSize + "_" + seqPar + ".txt";
+		
 		try {
 			File f = new File(filename);
 			
@@ -124,7 +146,7 @@ class MyFiles {
 			w.close();
 		}
 		catch(IOException e) { // very general exception handling
-			
+			e.printStackTrace();
 		}
 	}
 }
