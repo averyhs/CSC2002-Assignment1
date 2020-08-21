@@ -1,7 +1,7 @@
 # Simple Makefile to compile Assignment 1 source files.
 # Adapted from file uploaded to Vula site CSC2001F(2019) by P Marais.
 
-# XXX: bin files compiled with make don't run on my pc because of different versions of JRE
+CC=javac
 
 BINDIR=./bin
 SRCDIR=./src
@@ -9,7 +9,7 @@ DOCDIR=./doc
 
 .SUFFIXES: .java .class
 
-default: clean cleandocs compile docs
+default: all
 
 # General build rule: .java => .class
 ${BINDIR}/%.class: ${SRCDIR}/%.java
@@ -21,14 +21,18 @@ ${BINDIR}/PointElevation.class: &{SRCDIR}/PointElevation.java
 ${BINDIR}/ElevationAnalysis.class: ${SRCDIR}/ElevationAnalysis.java ${BINDIR}/PointElevation.class
 ${BINDIR}/TerrainClassify.class: ${SRCDIR}/TerrainClassify.java ${BINDIR}/ElevationAnalysis.class ${BINDIR}/MyFiles.class
 
+all: clean clean-docs compile docs
+
 compile:
 	javac -d ${BINDIR} ${SRCDIR}/*.java
-
-clean:
-	rm -f ${BINDIR}/*.class
 
 docs:
 	javadoc  -cp ${BINDIR} -d ${DOCDIR} ${SRCDIR}/*.java
 
-cleandocs:
+clean:
+	rm -f ${BINDIR}/*.class
+
+clean-docs:
 	rm -rf ${DOCDIR}/*
+
+.PHONY: default all compile docs clean clean-docs
