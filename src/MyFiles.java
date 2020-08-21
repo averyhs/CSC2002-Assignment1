@@ -102,7 +102,7 @@ public class MyFiles {
 	 * @param seqPar
 	 * @param usePathPrefix
 	 */
-	public static void compileTestData(double[][] dataSeq, double[][] dataPar, int[] seqCutoffs, boolean usePathPrefix) {
+	public static void compileTestData(double[][] dataSeq, double[][] dataPar, int[] seqCutoffs, String step, boolean usePathPrefix) {
 		/* FIXME:
 		 * How can this file always be put in to ROOT/io-files?
 		 */
@@ -112,11 +112,10 @@ public class MyFiles {
 		
 		String dataSize = dataDims[0]+"x"+dataDims[1]; // dimensions of data, <row>x<col>
 		
-		
-		String filenameSeq = pp + dataSize + "_benchmarking" + ".txt";
+		String filename = pp + dataSize + "_benchmarking_"+ step + ".txt";
 		
 		try {
-			File f = new File(filenameSeq); // file
+			File f = new File(filename); // file
 			
 			// if file doesn't exist, create it
 			// if file does exist, clear it

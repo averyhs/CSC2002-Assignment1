@@ -28,8 +28,6 @@ public class TerrainClassify {
 		
 		if (args.length>2) {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
-				System.out.println("Doing benchamrk tests...");
-				
 				// 'warm-up'
 				for (int i=0; i<100; i++) { // num loops based on experimentation
 					fjPool.invoke(new ElevationAnalysis());
@@ -44,6 +42,8 @@ public class TerrainClassify {
 				 * Fine version:
 				 * seq cutoff increases by constant step
 				 */				
+				// coarse
+				System.out.println("Doing benchamrk test coarse...");
 				for (int c=0; c<p; c++) { // increment cutoff p times
 					ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
 					cutoffs[c] = (int)(5*Math.pow(10,c));
@@ -59,10 +59,30 @@ public class TerrainClassify {
 						parTimes[c][i] = tock();
 					}
 				}
-				ElevationAnalysis.clearFlags();
-				
 				System.out.println("Writing to file...");
-				MyFiles.compileTestData(seqTimes, parTimes, cutoffs, true);
+				MyFiles.compileTestData(seqTimes, parTimes, cutoffs, "coarse", true);
+				
+				// fine
+				System.out.println("Doing benchamrk test fine...");
+				for (int c=0; c<p; c++) { // increment cutoff p times
+					ElevationAnalysis.setSequentialCutoff(500+c*1500/p);
+					cutoffs[c] = (int)(500+c*1500/p);
+					for (int i=0; i<n; i++) { // run n tests
+						System.gc(); // minimize chances of gc running in timing blocks
+						ElevationAnalysis.clearFlags();
+						tick();
+						analyze.findBasins(); // sequential
+						seqTimes[c][i] = tock();
+						ElevationAnalysis.clearFlags();
+						tick();
+						fjPool.invoke(new ElevationAnalysis()); // parallel
+						parTimes[c][i] = tock();
+					}
+				}
+				System.out.println("Writing to file...");
+				MyFiles.compileTestData(seqTimes, parTimes, cutoffs, "fine", true);
+				
+				ElevationAnalysis.clearFlags();
 			}
 		}
 		
