@@ -138,8 +138,11 @@ class MyFiles {
 			
 			for (int c=0; c<data.length; c++) {
 				w.write("\n# Sequential cutoff: "+seqCutoffs[c]+"\n");
+				w.write("# min: "+trunc(Stats.min(data[c]),8)+
+						"\n# max: "+trunc(Stats.max(data[c]),8)+
+						"\n# mean: "+trunc(Stats.mean(data[c]),8)+"\n");
 				for (int i=0; i<data[0].length; i++) {
-					w.write(data[c][i] + "\n");
+					w.write(trunc(data[c][i],8) + "\n");
 				}
 			}
 			
@@ -147,6 +150,17 @@ class MyFiles {
 		}
 		catch(IOException e) { // very general exception handling
 			e.printStackTrace();
+		}
+	}
+	
+	private static String trunc(double val, int len) {
+		// NOTE: precision and accuracy lost is negligible in this application
+		String str = String.valueOf(val);
+		if (str.length() > len) {
+			return str.substring(0,len);
+		}
+		else {
+			return str;
 		}
 	}
 }
