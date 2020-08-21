@@ -111,31 +111,30 @@ public class MyFiles {
 		else {pp="";}
 		
 		String dataSize = dataDims[0]+"x"+dataDims[1]; // dimensions of data, <row>x<col>
+		int length = dataDims[0]*dataDims[1];
 		
 		String filename = pp + dataSize + "_benchmarking_"+ step + ".txt";
+		String plot_filename = pp + dataSize + "_plot_" + step + ".txt";
 		
 		try {
-			File f = new File(filename); // file
+			// files
+			File f = new File(filename);
+			File plot_f = new File(plot_filename);
 			
-			// if file doesn't exist, create it
-			// if file does exist, clear it
+			// if files don't exist, create them
+			// if files do exist, clear them
 			if (f.createNewFile()) {}
-			else {
-				try {
-					FileWriter wTemp = new FileWriter(f);
-					wTemp.write(""); // clear file
-					wTemp.close();
-				}
-				catch(IOException e) { // very general exception handling
-					e.printStackTrace();
-				}
-			}
+			else {clearFile(f);}
+			if (plot_f.createNewFile()) {}
+			else {clearFile(plot_f);}
 			
-			// create writer
+			// create writers
 			FileWriter w = new FileWriter(f, true);
+			FileWriter plot_w = new FileWriter(plot_f, true);
 			
-			// write header
+			// write headers
 			w.write("# Speed Test Data\n# Units: ms\n# Data size: "+dataSize+"\n# format: <SequentialTime>  <ParallelTime>\n");
+			plot_w.write("# NumThreads Speedup \n");
 			
 			// write data (// with no errors, dataPar.length==dataSeq.length)
 			for (int c=0; c<dataPar.length; c++) {
@@ -145,10 +144,23 @@ public class MyFiles {
 						String.format("\n# mean: %s, %s\n",trunc(Stats.mean(dataSeq[c]),8),trunc(Stats.mean(dataPar[c]),8)));
 				for (int i=0; i<dataPar[0].length; i++) {
 					w.write(String.format("%-12s%-8s\n",trunc(dataSeq[c][i],8),trunc(dataPar[c][i],8)));
+					plot_w.write(String.format("%s %s\n",numThreads(length,seqCutoffs[c]),dataSeq[c][i]/dataPar[c][i]));
 				}
 			}
 			// close writer
 			w.close();
+			plot_w.close();
+		}
+		catch(IOException e) { // very general exception handling
+			e.printStackTrace();
+		}
+	}
+	
+	private static void clearFile(File f) {
+		try {
+			FileWriter wTemp = new FileWriter(f);
+			wTemp.write(""); // clear file
+			wTemp.close();
 		}
 		catch(IOException e) { // very general exception handling
 			e.printStackTrace();
@@ -164,6 +176,11 @@ public class MyFiles {
 		else {
 			return str;
 		}
+	}
+	
+	private static int numThreads(int length, int cutoff) {
+		double log = Math.log(length/cutoff)/Math.log(2);
+		return (int)Math.pow(2,Math.ceil(log));
 	}
 }
 
