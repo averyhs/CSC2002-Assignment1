@@ -36,7 +36,8 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	private static int SequentialCutoff = 500;
 	
 	/**
-	 * <p>A grid of point elevations, the data to be analyzed.</p>
+	 * <p>A grid of point elevations, the data to be analyzed,
+	 *  mapped onto a 1-dimensional array.</p>
 	 * <p>This is a static variable so that all the threads of my 
 	 * simple divide-and-conquer algorithm can access it. Being
 	 * static does create some weak points though, for example 
@@ -44,13 +45,21 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * of these objects are still supposed to be working on the 
 	 * previous map.</p>
 	 */
-	private static PointElevation[][] map = null;
+	private static PointElevation[] map = null;
 	
-	int ilo, jlo, ihi, jhi; // indexes for for loops
+	/**
+	 * <p>The number of columns of the original grid, needed
+	 * for transforming between 1D indexes and 2D indexes.</p>
+	 */
+	private static int cols;
+	
+	
+	int ilo, ihi; // indexes for for loops
 	
 	/**
 	 * <p>Creates a new ElevationAnalysis object with map data given
-	 * by the PointElevation array passed in.</p>
+	 * by the PointElevation array passed in. Indexes initialized
+	 * to cover entire array.</p>
 	 * 
 	 * <p>Note: This constructor resets the static map of the class. 
 	 * It should not be called while another instantiation is 
@@ -58,53 +67,49 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 * 
 	 * @param m A point elevation grid containing the data.
 	 */
-	ElevationAnalysis(PointElevation[][] m) {
+	ElevationAnalysis(PointElevation[] m, int c) {
 		map = m;
-		System.out.println("Warning: ElevationAnalysis.map has been reset.");
+		cols = c;
+		ilo = 0;
+		ihi = map.length;
+		//System.out.println("Warning: ElevationAnalysis.map has been reset.");
 	}
 	
 	/**
-	 * <p>Creates new ElevationAnalysis object with loop indices set to
+	 * <p>Creates new ElevationAnalysis object with loop indexes set to
 	 * cover the whole grid. Map is unchanged.</p>
 	 */
 	ElevationAnalysis() {
 		ilo = 0;
-		jlo = 0;
 		ihi = map.length;
-		jhi = map[0].length;
 	}
 	
 	/**
 	 * <p>Creates a new ElevationAnalysis object with loop indexes 
 	 * given by the values passed in. Map is unchanged.</p>
 	 * 
-	 * @param ilo Starting row index
-	 * @param jlo Starting col index
-	 * @param ihi Ending row index
-	 * @param jhi Ending col index
+	 * @param ilo Starting index
+	 * @param ihi Ending index
 	 */
-	ElevationAnalysis(int ilo, int jlo, int ihi, int jhi) {
+	ElevationAnalysis(int ilo, int ihi) {
 		this.ilo = ilo;
-		this.jlo = jlo;
 		this.ihi = ihi;
-		this.jhi = jhi;
 	}
 	
 	/*
 	 * Check all neighbors of point(i,j) are at least 
 	 * HEIGHT_DIFF meters higher
 	 */
-	private boolean passBasinCheck(int i, int j) {
+	private boolean passBasinCheck(int i) {
 		boolean pass = 
-				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j-1].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i-1][j+1].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i][j-1].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i][j+1].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j-1].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j].val() &&
-				map[i][j].val()+HEIGHT_DIFF <= map[i+1][j+1].val();
-		 
+				map[i].val()+HEIGHT_DIFF <= map[i-cols-1].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i-cols].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i-cols+1].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i-1].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i+1].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i+cols-1].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i+cols].val() &&
+				map[i].val()+HEIGHT_DIFF <= map[i+cols+1].val();
 		return pass;
 	}
 	
@@ -115,17 +120,14 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	public int findBasins() {
 		int basinCount = 0;
 		for (int i=ilo; i<ihi; i++) {
-			for (int j=jlo; j<jhi; j++) {
-				
-				if (i==0 || i==map.length-1 || j==0 || j==map[0].length-1) {
-					// point is on the border of the map
-					continue;
-				}
-				if (passBasinCheck(i,j)) {
-					// point qualifies as basin
-					map[i][j].flagAsBasin();
-					basinCount++;
-				}
+			if (i<cols || i>(map.length-cols) || (i%cols)==0 || (i%cols)==(cols-1)) {
+				// point is on the border of the map
+				continue;
+			}
+			if (passBasinCheck(i)) {
+				// point qualifies as basin
+				map[i].flagAsBasin();
+				basinCount++;
 			}
 		}
 		return basinCount;
@@ -142,13 +144,11 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 		int[][] list = new int[basinCount][2];
 		int l=0; // list index
 		
-		for (int i=0; i<ElevationAnalysis.map.length; i++) {
-			for (int j=0; j<ElevationAnalysis.map.length; j++) {
-				if (ElevationAnalysis.map[i][j].isBasin()) {
-					list[l][0] = i;
-					list[l][1] = j;
-					l++;
-				}
+		for (int i=0; i<map.length; i++) {
+			if (map[i].isBasin()) {
+				list[l][0] = i/cols;
+				list[l][1] = i%cols;
+				l++;
 			}
 		}
 		return list;
@@ -161,28 +161,14 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 */
 	@Override
 	public Integer compute() {
-		
-		int num_rows = ihi-ilo;
-		int num_cols = jhi-jlo;
-		
-		if ((num_rows*num_cols) < SequentialCutoff) {
+		if ((ihi-ilo) < SequentialCutoff) {
 			return findBasins(); // do sequentially
 		}
 		
 		else {
 			// Spawn branches
-			ElevationAnalysis b1;
-			ElevationAnalysis b2;
-			
-			// divide portion of map by halving longest 'side'
-			if (num_rows >= num_cols) {
-				b1 = new ElevationAnalysis(ilo, jlo, (ilo+ihi)/2, jhi);
-				b2 = new ElevationAnalysis((ilo+ihi)/2, jlo, ihi, jhi); 
-			}
-			else { // num_cols > num_rows
-				b1 = new ElevationAnalysis(ilo, jlo, ihi, (jlo+jhi)/2);
-				b2 = new ElevationAnalysis(ilo, (jlo+jhi)/2, ihi, jhi);
-			}
+			ElevationAnalysis b1 = new ElevationAnalysis(ilo, (ilo+ihi)/2);
+			ElevationAnalysis b2 = new ElevationAnalysis((ilo+ihi)/2, ihi);
 			
 			b1.fork();
 			int b2Ans = b2.compute();
@@ -206,28 +192,8 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	 */
 	public static void clearFlags() {
 		for (int i=0; i<map.length; i++) {
-			for (int j=0; j<map[0].length; j++) {
-				map[i][j].clearFlag();
-			}
+			map[i].clearFlag();
 		}
 	}
 	
-	/**
-	 * <p>Get the dimensions of the map.</p>
-	 * @return int array containing {length, width}
-	 */
-	public static int[] getMapdims() {
-		return new int[] {map.length, map[0].length};
-	}
 }
-
-
-
-
-
-
-
-
-
-
-

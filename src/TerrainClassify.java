@@ -24,7 +24,7 @@ public class TerrainClassify {
 		String infile = args[0];
 		String outfile = args[1];
 		
-		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile));
+		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile), MyFiles.getDataDims()[1]);
 		
 		if (args.length>2) {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
@@ -53,9 +53,8 @@ public class TerrainClassify {
 				}
 				ElevationAnalysis.clearFlags();
 				
-				String dataSize = ElevationAnalysis.getMapdims()[0]+"x"+ElevationAnalysis.getMapdims()[1];
-				MyFiles.compileTestData(seqTimes, cutoffs, dataSize, "sequential", true);
-				MyFiles.compileTestData(parTimes, cutoffs, dataSize, "parallel", true);
+				MyFiles.compileTestData(seqTimes, cutoffs, "sequential", true);
+				MyFiles.compileTestData(parTimes, cutoffs, "parallel", true);
 			}
 		}
 		
