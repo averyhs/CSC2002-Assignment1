@@ -16,8 +16,8 @@ public class TerrainClassify {
 		// variables & storage arrays for speed tests:
 		int n = 20; // number of times to run speed tests
 		int p = 5; // number of sequential cutoffs to test at
-		long[][] seqTimes = new long[p][n];
-		long[][] parTimes = new long[p][n];
+		double[][] seqTimes = new double[p][n];
+		double[][] parTimes = new double[p][n];
 		int[] cutoffs = new int[p];
 		
 		// IO files
@@ -74,9 +74,9 @@ public class TerrainClassify {
 	/**
 	 * <p>Calculates and returns the time elapsed since 
 	 * the last tick() call.</p>
-	 * @return Elapsed time in ns
+	 * @return Elapsed time in ms
 	 */
-	private static long tock() {
-		return System.nanoTime()-t_tick;
+	private static double tock() {
+		return (System.nanoTime()-t_tick)*Math.pow(10,-6);
 	}
 }
