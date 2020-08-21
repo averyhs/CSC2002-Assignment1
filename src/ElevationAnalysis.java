@@ -179,7 +179,7 @@ public class ElevationAnalysis extends RecursiveTask<Integer> {
 	}
 	
 	/**
-	 * <p>Set the sequential cutoff value for the class.</p>
+	 * <p>Sets the sequential cutoff value for the class.</p>
 	 * 
 	 * @param cutoff New sequential cutoff value
 	 */

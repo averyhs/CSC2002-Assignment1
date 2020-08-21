@@ -28,6 +28,8 @@ public class TerrainClassify {
 		
 		if (args.length>2) {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
+				System.out.println("Doing benchamrk tests...");
+				
 				// 'warm-up'
 				for (int i=0; i<100; i++) { // num loops based on experimentation
 					fjPool.invoke(new ElevationAnalysis());
@@ -59,12 +61,15 @@ public class TerrainClassify {
 				}
 				ElevationAnalysis.clearFlags();
 				
+				System.out.println("Writing to file...");
 				MyFiles.compileTestData(seqTimes, parTimes, cutoffs, true);
 			}
 		}
 		
 		// Produce list of basin coords
+		System.out.println("Finding basins...");
 		int num_basins = fjPool.invoke(new ElevationAnalysis());
+		System.out.println("Writing to file...");
 		MyFiles.compileTerrainData(num_basins, ElevationAnalysis.listBasins(num_basins), outfile);
 	}
 	

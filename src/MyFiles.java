@@ -10,7 +10,7 @@ import java.io.IOException;
  * @author hrrhan002
  *
  */
-class MyFiles {
+public class MyFiles {
 	
 	/**
 	 * <p>Dimensions of terrain data grid of input file.</p>
@@ -26,7 +26,7 @@ class MyFiles {
 	}
 	
 	/**
-	 * <p>Reads terrain data from a file in format shown below. Data is written into
+	 * <p>Reads terrain data from a file. Data is written into
 	 * a {@link PointElevation} array. Stores dimensions of the grid of data to dataDims field.</p>
 	 * <p> Required file format:<br> <terrain num rows – INT> <terrain num cols – INT> <br>
 	 * <height at grid pos (0,0) - FLOAT> <height at grid pos (0,1) - FLOAT> ... etc.</p>
@@ -95,8 +95,7 @@ class MyFiles {
 	}
 	
 	/**
-	 * <p>Writes speed test data to two files: one for reading and one
-	 * to use for plotting.</p>
+	 * <p>Writes benchmarking data to file.</p>
 	 * 
 	 * @param data
 	 * @param seqCutoffs
