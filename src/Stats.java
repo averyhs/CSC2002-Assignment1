@@ -10,7 +10,7 @@ public class Stats {
 	 * @param arr Array
 	 * @return maximum
 	 */
-	public static double max(long[] arr) {
+	public static double max(double[] arr) {
 		double max = 0;
 		for (int i=0; i<arr.length; i++) {
 			if (arr[i]>max) {
@@ -46,6 +46,15 @@ public class Stats {
 			sum += arr[i];
 		}
 		return sum;
+	}
+	
+	/**
+	 * <p>Calculates mean of elements of array.</p>
+	 * @param arr Array
+	 * @return mean
+	 */
+	public static double mean(double[] arr) {
+		return sum(arr)/arr.length;
 	}
 	
 }
