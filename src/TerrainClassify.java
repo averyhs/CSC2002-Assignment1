@@ -41,6 +41,7 @@ public class TerrainClassify {
 					ElevationAnalysis.setSequentialCutoff((int)(5*Math.pow(10,c)));
 					cutoffs[c] = (int)(5*Math.pow(10,c));
 					for (int i=0; i<n; i++) { // run n tests
+						System.gc(); // minimize chances of gc running in timing blocks
 						ElevationAnalysis.clearFlags();
 						tick();
 						analyze.findBasins(); // sequential
@@ -73,7 +74,7 @@ public class TerrainClassify {
 	/**
 	 * <p>Calculates and returns the time elapsed since 
 	 * the last tick() call.</p>
-	 * @return Elapsed time in ms
+	 * @return Elapsed time in ns
 	 */
 	private static long tock() {
 		return System.nanoTime()-t_tick;

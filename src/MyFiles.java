@@ -139,7 +139,7 @@ class MyFiles {
 			for (int c=0; c<data.length; c++) {
 				w.write("\n# Sequential cutoff: "+seqCutoffs[c]+"\n");
 				for (int i=0; i<data[0].length; i++) {
-					w.write(data[c][i] + "\n");
+					w.write(data[c][i]*Math.pow(10,-6) + "\n");
 				}
 			}
 			
