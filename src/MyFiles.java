@@ -142,6 +142,13 @@ public class MyFiles {
 				w.write(String.format("# min: %s, %s",trunc(Stats.min(dataSeq[c]),8),trunc(Stats.min(dataPar[c]),8))+
 						String.format("\n# max: %s, %s",trunc(Stats.max(dataSeq[c]),8),trunc(Stats.max(dataPar[c]),8))+
 						String.format("\n# mean: %s, %s\n",trunc(Stats.mean(dataSeq[c]),8),trunc(Stats.mean(dataPar[c]),8)));
+				
+				// get the speedup values to calculate the mean
+				double[] speedup = new double[dataSeq[c].length];
+				for (int a=0; a<dataSeq[c].length; a++) {speedup[a] = dataSeq[c][a]/dataPar[c][a];}
+				double speedupMean = Stats.mean(speedup);
+				plot_w.write(String.format("# mean %s\n",speedupMean));
+				
 				for (int i=0; i<dataPar[0].length; i++) {
 					w.write(String.format("%-12s%-8s\n",trunc(dataSeq[c][i],8),trunc(dataPar[c][i],8)));
 					plot_w.write(String.format("%s %s\n",numThreads(length,seqCutoffs[c]),dataSeq[c][i]/dataPar[c][i]));
