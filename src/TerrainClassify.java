@@ -65,8 +65,8 @@ public class TerrainClassify {
 				// fine
 				System.out.println("Doing benchamrk test fine...");
 				for (int c=0; c<p; c++) { // increment cutoff p times
-					ElevationAnalysis.setSequentialCutoff(500+c*1500/p);
-					cutoffs[c] = (int)(500+c*1500/p);
+					ElevationAnalysis.setSequentialCutoff(250+c*2500/(p));
+					cutoffs[c] = (int)(250+c*2500/(p));
 					for (int i=0; i<n; i++) { // run n tests
 						System.gc(); // minimize chances of gc running in timing blocks
 						ElevationAnalysis.clearFlags();
@@ -108,4 +108,5 @@ public class TerrainClassify {
 	private static double tock() {
 		return (System.nanoTime()-t_tick)*Math.pow(10,-6);
 	}
+	
 }
