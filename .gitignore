@@ -11,3 +11,6 @@ io-files/*
 
 # Javadocs
 doc/*
+
+# Plots
+misc/*.png
