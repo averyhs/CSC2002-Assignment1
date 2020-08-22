@@ -13,13 +13,6 @@ public class TerrainClassify {
 	private static long t_tick;
 	
 	public static void main(String[] args) {
-		// variables & storage arrays for speed tests:
-		int n = 20; // number of times to run speed tests
-		int p = 5; // number of sequential cutoffs to test at
-		double[][] seqTimes = new double[p][n];
-		double[][] parTimes = new double[p][n];
-		int[] cutoffs = new int[p];
-		
 		// IO files
 		String infile = args[0];
 		String outfile = args[1];
@@ -28,6 +21,13 @@ public class TerrainClassify {
 		
 		if (args.length>2) {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
+				// variables & storage arrays for speed tests:
+				int n = 20; // number of times to run speed tests
+				int p = 10; // number of sequential cutoffs to test at
+				double[][] seqTimes = new double[p][n];
+				double[][] parTimes = new double[p][n];
+				int[] cutoffs = new int[p];
+				
 				// 'warm-up'
 				for (int i=0; i<100; i++) { // num loops based on experimentation
 					fjPool.invoke(new ElevationAnalysis());
