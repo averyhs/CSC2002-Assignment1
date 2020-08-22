@@ -95,12 +95,13 @@ public class MyFiles {
 	}
 	
 	/**
-	 * <p>Writes benchmarking data to file.</p>
+	 * <p>Writes benchmarking data to files (one for humans, two for gnuplot).</p>
 	 * 
-	 * @param data
-	 * @param seqCutoffs
-	 * @param seqPar
-	 * @param usePathPrefix
+	 * @param dataSeq Sequential speed data
+	 * @param dataPar Parallel speed data
+	 * @param seqCutoffs Sequential cutoff values
+	 * @param step Type of step in cutoff values ("coarse" or "fine")
+	 * @param usePathPrefix Whether or not to append prefix "io-files/" to filenames
 	 */
 	public static void compileTestData(double[][] dataSeq, double[][] dataPar, int[] seqCutoffs, String step, boolean usePathPrefix) {
 		/* FIXME:

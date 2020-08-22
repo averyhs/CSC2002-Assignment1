@@ -23,7 +23,7 @@ public class TerrainClassify {
 			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
 				// variables & storage arrays for speed tests:
 				int n = 20; // number of times to run speed tests
-				int p = 10; // number of sequential cutoffs to test at
+				int p = 7; // number of sequential cutoffs to test at
 				double[][] seqTimes = new double[p][n];
 				double[][] parTimes = new double[p][n];
 				int[] cutoffs = new int[p];
