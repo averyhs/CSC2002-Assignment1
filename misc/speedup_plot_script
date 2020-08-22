@@ -1,0 +1,28 @@
+# Filenames
+outFile="speedup_plot_".var.".png"
+inFile_d1="../io-files/256x256_plot_".var.".txt"
+inFile_m1="../io-files/256x256_plot_means_".var.".txt"
+inFile_d2="../io-files/512x512_plot_".var.".txt"
+inFile_m2="../io-files/512x512_plot_means_".var.".txt"
+inFile_d3="../io-files/1024x1024_plot_".var.".txt"
+inFile_m3="../io-files/1024x1024_plot_means_".var.".txt"
+
+# Setup
+set term pngcairo size 1564,838 enhanced dash enhanced font 'Times,16'
+set encoding utf8
+set out outFile
+set grid xtics ytics mxtics mytics
+
+# Axes
+#set logscale x
+set xlabel "Number of threads"
+set ylabel "Time (ms)"
+
+plot \
+	inFile_d1 pt 12 ps 2 lc rgb "#0099d4d6" notitle, inFile_m1 pt 13 ps 3 lc rgb "#0099d4d6" title "Data size 256x256", \
+	inFile_m1 w l lw 4 dt 1 lc rgb "#dd99d4d6" notitle, \
+	inFile_d2 pt 12 ps 2 lc rgb "#00457b9d" notitle, inFile_m2 pt 13 ps 3 lc rgb "#00457b9d" title "Data size 512x512", \
+	inFile_m2 w l lw 4 dt 1 lc rgb "#ee457b9d" notitle, \
+	inFile_d3 pt 12 ps 2 lc rgb "#001d3557" notitle, inFile_m3 pt 13 ps 3 lc rgb "#001d3557" title "Data size 1024x1024", \
+	inFile_m3 w l lw 4 dt 1 lc rgb "#ef1d3557" notitle
+	
