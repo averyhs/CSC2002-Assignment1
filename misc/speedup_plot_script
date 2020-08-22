@@ -17,6 +17,7 @@ set grid xtics ytics mxtics mytics
 set logscale x
 set xlabel "Number of threads"
 set ylabel "Speedup (seqTime/parTime)"
+set title "Plot showing the relationship between number of threads of a parallel process and speed relative to its sequential equivalent"
 
 plot \
 	inFile_d1 pt 12 ps 2 lc rgb "#0099d4d6" notitle, inFile_m1 pt 13 ps 3 lc rgb "#0099d4d6" title "Data size 256x256", \
