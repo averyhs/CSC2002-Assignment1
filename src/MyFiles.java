@@ -115,11 +115,13 @@ public class MyFiles {
 		
 		String filename = pp + dataSize + "_benchmarking_"+ step + ".txt";
 		String plot_filename = pp + dataSize + "_plot_" + step + ".txt";
+		String plot_m_filename = pp + dataSize + "_plot_means_" + step + ".txt";
 		
 		try {
 			// files
 			File f = new File(filename);
 			File plot_f = new File(plot_filename);
+			File plot_m_f = new File(plot_m_filename);
 			
 			// if files don't exist, create them
 			// if files do exist, clear them
@@ -127,14 +129,21 @@ public class MyFiles {
 			else {clearFile(f);}
 			if (plot_f.createNewFile()) {}
 			else {clearFile(plot_f);}
+			if (plot_m_f.createNewFile()) {}
+			else {clearFile(plot_m_f);}
 			
 			// create writers
 			FileWriter w = new FileWriter(f, true);
 			FileWriter plot_w = new FileWriter(plot_f, true);
+			FileWriter plot_m_w = new FileWriter(plot_m_f, true);
 			
 			// write headers
 			w.write("# Speed Test Data\n# Units: ms\n# Data size: "+dataSize+"\n# format: <SequentialTime>  <ParallelTime>\n");
 			plot_w.write("# NumThreads Speedup \n");
+			plot_m_w.write("# NumThreads SpeedupMean \n");
+			
+			double[] speedup = new double[dataSeq[0].length]; // for calculating means
+			int numThreads; // for calculated number of threads
 			
 			// write data (// with no errors, dataPar.length==dataSeq.length)
 			for (int c=0; c<dataPar.length; c++) {
@@ -143,20 +152,20 @@ public class MyFiles {
 						String.format("\n# max: %s, %s",trunc(Stats.max(dataSeq[c]),8),trunc(Stats.max(dataPar[c]),8))+
 						String.format("\n# mean: %s, %s\n",trunc(Stats.mean(dataSeq[c]),8),trunc(Stats.mean(dataPar[c]),8)));
 				
-				// get the speedup values to calculate the mean
-				double[] speedup = new double[dataSeq[c].length];
-				for (int a=0; a<dataSeq[c].length; a++) {speedup[a] = dataSeq[c][a]/dataPar[c][a];}
+				for (int a=0; a<dataSeq[c].length; a++) {speedup[a] = dataSeq[c][a]/dataPar[c][a];} // get the speedup values to calculate the mean
 				double speedupMean = Stats.mean(speedup);
-				plot_w.write(String.format("# mean %s\n",speedupMean));
+				numThreads = numThreads(length,seqCutoffs[c]);
 				
+				plot_m_w.write(String.format("%s %s\n",numThreads,speedupMean));
 				for (int i=0; i<dataPar[0].length; i++) {
 					w.write(String.format("%-12s%-8s\n",trunc(dataSeq[c][i],8),trunc(dataPar[c][i],8)));
-					plot_w.write(String.format("%s %s\n",numThreads(length,seqCutoffs[c]),dataSeq[c][i]/dataPar[c][i]));
+					plot_w.write(String.format("%s %s\n",numThreads,speedup[i]));
 				}
 			}
 			// close writer
 			w.close();
 			plot_w.close();
+			plot_m_w.close();
 		}
 		catch(IOException e) { // very general exception handling
 			e.printStackTrace();
