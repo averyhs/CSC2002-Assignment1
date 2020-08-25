@@ -8,10 +8,36 @@ import java.util.concurrent.ForkJoinPool;
  *
  */
 public class TerrainClassify {
-	private static ElevationAnalysis analyze; // redundant for parallel, needed for sequential
+	/**
+	 * <p>An <code>ElevationAnalysis</code> object created 
+	 * with the data from the file given as input to <code>main()</code>.</p>
+	 */
+	private static ElevationAnalysis analyze;
+	
+	/**
+	 * <p>A <code>ForkJoinPool</code> object to handle threads.</p>
+	 */
 	private static ForkJoinPool fjPool = new ForkJoinPool();
+	
+	/**
+	 * <p>Start time of a benchmark test. Value set by <code>tick()</code>
+	 * for temporary storage until <code>tock()</code> is called.</p>
+	 */
 	private static long t_tick;
 	
+	/**
+	 * <p>Reads input file, identifies all basins in the data, writes their
+	 * coordinates to output file, and performs benchmarking tests to compare
+	 * parallel vs sequential processing of the data.</p>
+	 * <p>The path of the data file is given as the first argument to the method, 
+	 * and the path of the file to write to is given as the second argument on
+	 * command line. A third argument may be given, "-b". If that argument is
+	 * given, benchmarking will be performed, otherwise benchmarking will be 
+	 * skipped and all the method will do is identify the basins (in parallel)
+	 * and write to the output file.</p>
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// IO files
 		String infile = args[0];
@@ -20,7 +46,7 @@ public class TerrainClassify {
 		analyze = new ElevationAnalysis(MyFiles.extractTerrainData(infile), MyFiles.getDataDims()[1]);
 		
 		if (args.length>2) {
-			if (args[2].equals("--benchmark") || args[2].equals("-b")) {
+			if (args[2].equals("-b")) {
 				// variables & storage arrays for speed tests:
 				int n = 20; // number of times to run speed tests
 				int p = 7; // number of sequential cutoffs to test at
@@ -94,15 +120,15 @@ public class TerrainClassify {
 	}
 	
 	/**
-	 * <p>Records the current time (stored in static field).</p>
+	 * <p>Records the current time (stored in <code>t_tick</code> field).</p>
 	 */
 	private static void tick() {
 		t_tick = System.nanoTime();
 	}
 	
 	/**
-	 * <p>Calculates and returns the time elapsed since 
-	 * the last tick() call.</p>
+	 * <p>Calculates and returns the time elapsed since the last tick() call.</p>
+	 * 
 	 * @return Elapsed time in ms
 	 */
 	private static double tock() {

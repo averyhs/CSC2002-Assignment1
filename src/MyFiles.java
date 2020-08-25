@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * File handling functions for Assignment1
+ * File handling functions for Assignment1.
  * 
  * @author hrrhan002
  *
@@ -13,13 +13,14 @@ import java.io.IOException;
 public class MyFiles {
 	
 	/**
-	 * <p>Dimensions of terrain data grid of input file.</p>
+	 * <p>Dimensions of terrain data grid read from input file.</p>
 	 */
 	private static int[] dataDims = new int[2];
 	
 	/**
-	 * <p>Accessor for dataDims (dimensions of terrain data).</p>
-	 * @return [num_rows, num_cols]
+	 * <p>Gets dimensions of terrain data.</p>
+	 * 
+	 * @return data dimensions, format [num_rows, num_cols].
 	 */
 	public static int[] getDataDims() {
 		return dataDims;
@@ -27,11 +28,11 @@ public class MyFiles {
 	
 	/**
 	 * <p>Reads terrain data from a file. Data is written into
-	 * a {@link PointElevation} array. Stores dimensions of the grid of data to dataDims field.</p>
-	 * <p> Required file format:<br> <terrain num rows – INT> <terrain num cols – INT> <br>
-	 * <height at grid pos (0,0) - FLOAT> <height at grid pos (0,1) - FLOAT> ... etc.</p>
-	 * @param filename
-	 * @return PointElevation array with data from file
+	 * a {@link PointElevation} array. Stores dimensions of the grid of data to <code>dataDims</code> field.</p>
+	 * <p> Required file format:<br> &lt;terrain num rows – INT&gt; &lt;terrain num cols – INT&gt; <br>
+	 * &lt;height at grid pos (0,0) - FLOAT&gt; &lt;height at grid pos (0,1) - FLOAT&gt; ... etc.</p>
+	 * @param filename Filepath to input file
+	 * @return <code>PointElevation</code> array with data from file.
 	 */
 	public static PointElevation[] extractTerrainData(String filename) {
 		try {
@@ -47,10 +48,10 @@ public class MyFiles {
 			dataDims[0] = inScanner.nextInt();
 			dataDims[1] = inScanner.nextInt();
 			
-			// create empty grid with dims
+			// create empty array
 			PointElevation[] map = new PointElevation[dataDims[0]*dataDims[1]];
 			
-			// populate grid
+			// populate array
 			for (int i=0; i<dataDims[0]*dataDims[1]; i++) {
 				map[i] = new PointElevation(inScanner.nextFloat());
 			}
@@ -70,7 +71,7 @@ public class MyFiles {
 	 * 
 	 * @param total Total number of basins listed
 	 * @param coords List of coordinates for each basin
-	 * @param filename Name of output file
+	 * @param filename Filepath of output file
 	 */
 	public static void compileTerrainData(int total, int[][] coords, String filename) {
 		try {
@@ -95,7 +96,7 @@ public class MyFiles {
 	}
 	
 	/**
-	 * <p>Writes benchmarking data to files (one for humans, two for gnuplot).</p>
+	 * <p>Writes benchmarking data to files (one file for humans, two for gnuplot).</p>
 	 * 
 	 * @param dataSeq Sequential speed data
 	 * @param dataPar Parallel speed data
@@ -173,6 +174,10 @@ public class MyFiles {
 		}
 	}
 	
+	/**
+	 * <p>Clear file by writing empty string to it.</p>
+	 * @param f File to clear
+	 */
 	private static void clearFile(File f) {
 		try {
 			FileWriter wTemp = new FileWriter(f);
@@ -184,6 +189,15 @@ public class MyFiles {
 		}
 	}
 	
+	/**
+	 * <p>Truncate a double to a certain number of characters.</p>
+	 * <p>Doesn't round, just truncates, so there is some accuracy 
+	 * lost. Used to make columns of numbers more readable.</p>
+	 * 
+	 * @param val Number to truncate
+	 * @param len Number of characters to truncate to
+	 * @return Truncated number, as string
+	 */
 	private static String trunc(double val, int len) {
 		// NOTE: precision and accuracy lost is negligible in this application
 		String str = String.valueOf(val);
@@ -195,6 +209,14 @@ public class MyFiles {
 		}
 	}
 	
+	/**
+	 * <p>Calculates the number of threads that will be created
+	 * for a given sequential cutoff and length of data array.</p>
+	 * 
+	 * @param length Length of data array, ie number of data points.
+	 * @param cutoff Sequential cutoff value used.
+	 * @return Number of threads.
+	 */
 	private static int numThreads(int length, int cutoff) {
 		double log = Math.log(length/cutoff)/Math.log(2);
 		return (int)Math.pow(2,Math.ceil(log));

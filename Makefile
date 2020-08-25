@@ -27,7 +27,7 @@ compile:
 	javac -d ${BINDIR} ${SRCDIR}/*.java
 
 docs:
-	javadoc  -cp ${BINDIR} -d ${DOCDIR} ${SRCDIR}/*.java
+	javadoc  -private -d ${DOCDIR} -cp ${BINDIR} ${SRCDIR}/*.java
 
 clean:
 	rm -f ${BINDIR}/*.class
