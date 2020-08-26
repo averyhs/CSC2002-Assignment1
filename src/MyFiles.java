@@ -56,8 +56,7 @@ public class MyFiles {
 			PointElevation[] map = new PointElevation[dataDims[0]*dataDims[1]];
 			
 			// populate array
-			//for (int i=0; i<dataDims[0]*dataDims[1]; i++) {
-			for (int i=0; i<10; i++) {
+			for (int i=0; i<dataDims[0]*dataDims[1]; i++) {
 				map[i] = new PointElevation(inScanner.nextFloat());
 			}
 			inScanner.close();
