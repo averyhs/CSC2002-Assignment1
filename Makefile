@@ -16,7 +16,8 @@ ${BINDIR}/%.class: ${SRCDIR}/%.java
 	javac $< -cp ${BINDIR} -d ${BINDIR}
 
 # Build dependency rules
-${BINDIR}/MyFiles.class: ${SRCDIR}/MyFiles.java
+${BINDIR}/Stats.class: ${SRCDIR}/Stats.java
+${BINDIR}/MyFiles.class: ${SRCDIR}/MyFiles.java ${BINDIR}/Stats.class
 ${BINDIR}/PointElevation.class: &{SRCDIR}/PointElevation.java
 ${BINDIR}/ElevationAnalysis.class: ${SRCDIR}/ElevationAnalysis.java ${BINDIR}/PointElevation.class
 ${BINDIR}/TerrainClassify.class: ${SRCDIR}/TerrainClassify.java ${BINDIR}/ElevationAnalysis.class ${BINDIR}/MyFiles.class
