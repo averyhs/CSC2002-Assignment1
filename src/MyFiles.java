@@ -3,6 +3,7 @@ import java.io.FileWriter;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * File handling functions for Assignment1.
@@ -40,6 +41,8 @@ public class MyFiles {
 			File inFile = new File(filename);
 			Scanner inScanner = new Scanner(inFile);
 			
+			inScanner.useLocale(Locale.ENGLISH);
+
 			/* XXX:
 			 * Assumption is that files are well formed. No hasNext*() checks.
 			 */
@@ -48,6 +51,7 @@ public class MyFiles {
 			dataDims[0] = inScanner.nextInt();
 			dataDims[1] = inScanner.nextInt();
 			
+
 			// create empty array
 			PointElevation[] map = new PointElevation[dataDims[0]*dataDims[1]];
 			
